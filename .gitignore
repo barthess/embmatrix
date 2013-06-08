@@ -1,0 +1,5 @@
+*.swp
+*.origin
+*.o
+*.so
+testsuite
