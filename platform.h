@@ -5,7 +5,16 @@
   #define matrixDbgCheck(a,b) chDbgCheck(a,b)
   #include "misc_math.hpp"
 #else
-  #define matrixDbgCheck(a,b)
+  #include <iostream>
+  #include <cstdlib>
+  #include <assert.h>
+  #include <math.h>
+  #define matrixDbgCheck(c, msg) {              \
+    if (!(c)){                                  \
+      std::cout << msg;                         \
+      exit(1);                                  \
+    }                                           \
+  }
 #endif
 
 #endif /* MATRIX_DBG_HPP_ */

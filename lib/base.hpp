@@ -96,9 +96,9 @@ public:
    * Invers matrix itself
    * The function returns 1 on success, 0 on failure.
    */
-  int32_t inverse(){
+  int32_t inverse(void){
     matrixDbgCheck(this->col == this->row, "matrix must be square");
-    return matrix_inverse(this->col, this->m);
+    return matrix_inverse(static_cast<int32_t>(this->col), this->m);
   };
 
   /**

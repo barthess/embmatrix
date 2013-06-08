@@ -10,8 +10,7 @@ CPPWARN = -Wall \
 		  -Wconversion \
 		  -Wsign-conversion \
 		  -Wold-style-cast \
-		  -Wnon-virtual-dtor \
-		  -Weffc++
+		  -Wnon-virtual-dtor 
 
 CFLAGS = -O0 -ggdb
 CPPFLAGS = $(CFLAGS) $(CPPWARN)
