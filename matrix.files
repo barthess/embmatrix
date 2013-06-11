@@ -1,0 +1,8 @@
+lib/base.hpp
+lib/primitives.hpp
+lib/quaternion.hpp
+lib/vector.hpp
+lib/vector3d.hpp
+matrix.hpp
+platform.h
+testsuite.cpp

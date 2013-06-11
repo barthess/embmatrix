@@ -2,13 +2,10 @@ CC = g++
 CPPWARN = -Wall \
 		  -Wextra \
 		  -Wformat \
-		  -Wconversion \
 		  -Woverloaded-virtual \
 		  -Wctor-dtor-privacy  \
 		  -Winit-self \
 		  -Wunreachable-code \
-		  -Wconversion \
-		  -Wsign-conversion \
 		  -Wold-style-cast \
 		  -Wnon-virtual-dtor 
 

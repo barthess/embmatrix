@@ -24,7 +24,7 @@ public:
     this->m = m;
     this->col = c;
     this->row = r;
-  };
+  }
 
   /**
    * @brief Copy constructor. Forbidden.
@@ -38,7 +38,7 @@ public:
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++)
       this->m[i] = v[i];
-  };
+  }
 
   /**
    * Initialize matrix using pattern
@@ -47,28 +47,28 @@ public:
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++)
       this->m[i] = pattern;
-  };
+  }
 
   /**
    * Return pointer to raw matrix data
    */
   T *array(void) const {
     return this->m;
-  };
+  }
 
   /**
    * Return pointer to raw matrix data
    */
   uint32_t getCol(void) const {
     return this->col;
-  };
+  }
 
   /**
    * Return pointer to raw matrix data
    */
   uint32_t getRow(void) const {
     return this->row;
-  };
+  }
 
   /**
    * Modulus
@@ -90,7 +90,7 @@ public:
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++)
       this->m[i] /= R;
-  };
+  }
 
   /**
    * Invers matrix itself
@@ -99,7 +99,7 @@ public:
   int32_t inverse(void){
     matrixDbgCheck(this->col == this->row, "matrix must be square");
     return matrix_inverse(static_cast<int32_t>(this->col), this->m);
-  };
+  }
 
   /**
    * Reshape matrix
@@ -108,7 +108,7 @@ public:
     matrixDbgCheck((this->col * this->row) == (c * r), "resulted matrix size differ");
     this->col = c;
     this->row = r;
-  };
+  }
 
   /**
    * Trnaspose matrix storing result in different matrix
@@ -119,7 +119,7 @@ public:
         "matrix sizes incorrect");
 
     matrix_transpose(col, row, m, result->m);
-  };
+  }
 
   /**
    * Transpose inplace
@@ -152,7 +152,7 @@ public:
         }
       }
     }
-  };
+  }
 
   /**
    *
@@ -162,7 +162,7 @@ public:
     for (uint32_t i=0; i<len; i++){
       m[i] += v;
     }
-  };
+  }
 
   /**
    *
@@ -173,7 +173,7 @@ public:
     for (uint32_t i=0; i<len; i++){
       m[i] += M.m[i];
     }
-  };
+  }
 
   /**
    *
@@ -183,7 +183,7 @@ public:
     for (uint32_t i=0; i<len; i++){
       m[i] -= v;
     }
-  };
+  }
 
   /**
    *
@@ -194,7 +194,7 @@ public:
     for (uint32_t i=0; i<len; i++){
       m[i] -= M->m[i];
     }
-  };
+  }
 
   /**
    * Scale matrix elemets by constant
@@ -203,27 +203,27 @@ public:
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++)
       this->m[i] *= v;
-  };
+  }
 
-  /**@brief
-   * Subindex for Matrix elements assignation.
+  /**
+   * @brief Subindex for Matrix elements assignation.
    * @param r
    * @param c
    * @return pointer to the element.
    */
   T& operator() (const uint32_t r, const uint32_t c){
     return this->m[calc_subindex(r,c)];
-  };
+  }
 
-  /**@brief
-   * Subindex for Matrix element.
+  /**
+   * @brief Subindex for Matrix element.
    * @param r
    * @param c
    * @return the element.
    */
   T operator() (uint32_t r, uint32_t c) const{
     return this->m[calc_subindex(r, c)];
-  };
+  }
 
   /**
    * @brief   Multiply matrix themself by another matrix
@@ -291,7 +291,7 @@ private:
   uint32_t calc_subindex(uint32_t r, uint32_t c) const {
     matrixDbgCheck((c < col) && (r < row), "overflow");
     return r*col + c;
-  };
+  }
 
   uint32_t row;
   uint32_t col;
@@ -306,7 +306,7 @@ private:
 template<typename T, int r, int c>
 class MatrixBuf : public Matrix<T>{
 protected:
-   T m[r*c];
+  T m[r*c];
 
 public:
   MatrixBuf(void) :
@@ -314,21 +314,21 @@ public:
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = 0;
-  };
+  }
 
   MatrixBuf(const T *initvector) :
     Matrix<T>(m, r, c, sizeof(m))
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = initvector[i];
-  };
+  }
 
   MatrixBuf(T pattern) :
     Matrix<T>(m, r, c, sizeof(m))
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = pattern;
-  };
+  }
 
   /**
    * @brief   Copy operator.
