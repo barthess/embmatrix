@@ -4,10 +4,11 @@
 #include <cstddef>
 
 /**
- * Base matrix class
+ * @brief       Low level matrix class.
+ * @note        Dangerouse. Use it if you want create interleaved matrixes.
  */
 template<typename T>
-class Matrix{
+class MatrixLL{
 public:
   /**
    * @brief Constructor
@@ -18,7 +19,7 @@ public:
    * @param[in] bufsize   size of data array in bytes. Need to check correctness
    *                      of sizes
    */
-  Matrix(T *m, uint32_t r, uint32_t c, size_t bufsize){
+  MatrixLL(T *m, uint32_t r, uint32_t c, size_t bufsize){
     matrixDbgCheck(((0 != r) && (0 != c)), "Zero sizes forbidden");
     matrixDbgCheck(bufsize == (r * c * sizeof(T)), "Probable overflow");
     this->m = m;
@@ -29,7 +30,7 @@ public:
   /**
    * @brief Copy constructor. Forbidden.
    */
-  Matrix(const Matrix &m);
+  MatrixLL(const MatrixLL &m);
 
   /**
    * Initialize matrix using vector of values starting from 0th element
@@ -52,7 +53,7 @@ public:
   /**
    * Return pointer to raw matrix data
    */
-  T *array(void) const {
+  T *getArray(void) const {
     return this->m;
   }
 
@@ -113,12 +114,23 @@ public:
   /**
    * Trnaspose matrix storing result in different matrix
    */
-  void transpose(Matrix *result){
+  void transpose(MatrixLL *result){
     matrixDbgCheck(result != this, "this functions can not work inplace");
     matrixDbgCheck((col == result->row) && (row == result->col),
         "matrix sizes incorrect");
 
     matrix_transpose(col, row, m, result->m);
+  }
+
+  /**
+   * Trnaspose matrix
+   */
+  MatrixLL operator~ (void){
+    T m[this->col * this->row];
+    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+
+    this->transpose(&result);
+    return result;
   }
 
   /**
@@ -167,12 +179,23 @@ public:
   /**
    *
    */
-  void operator += (const Matrix &M){
+  void operator += (const MatrixLL &M){
     matrixDbgCheck((M.col == col) && (M.row == row), "matrix sizes must be same");
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++){
       m[i] += M.m[i];
     }
+  }
+
+  /**
+   *
+   */
+  MatrixLL operator + (const MatrixLL &M){
+    T m[this->col * this->row];
+    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+    result = *this;
+    result += M;
+    return result;
   }
 
   /**
@@ -188,12 +211,23 @@ public:
   /**
    *
    */
-  void operator -= (const Matrix *M){
-    matrixDbgCheck((M->col == col) && (M->row == row), "matrix sizes must be same");
+  void operator -= (const MatrixLL &M){
+    matrixDbgCheck((M.col == col) && (M.row == row), "matrix sizes must be same");
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++){
-      m[i] -= M->m[i];
+      m[i] -= M.m[i];
     }
+  }
+
+  /**
+   *
+   */
+  MatrixLL operator - (const MatrixLL &M){
+    T m[this->col * this->row];
+    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+    result = *this;
+    result -= M;
+    return result;
   }
 
   /**
@@ -230,24 +264,33 @@ public:
    * @param[in] right     multiplier
    * @param[out] result   place result in it
    */
-  void mul(const Matrix<T> *right, Matrix<T> *result){
+  void mul(const MatrixLL &right, MatrixLL &result){
 
-    matrixDbgCheck(((this != right) && (this != result) && (result != right)),
-                                    "this functions can not work inplace");
+    matrixDbgCheck(((this->col == right.row) &&
+                (result.row == this->row) &&
+                (result.col == right.col)), "sizes inconsistent");
 
-    matrixDbgCheck(((this->col == right->row) &&
-                (result->row == this->row) &&
-                (result->col == right->col)), "sizes inconsistent");
+    matrix_multiply(this->row, this->col, right.col,
+                    this->m, right.m, result.m);
+  }
 
-    matrix_multiply(this->row, this->col, right->col,
-                    this->m, right->m, result->m);
+  /**
+   * @brief   Multiply operator
+   * @param[in] right     multiplier
+   */
+  MatrixLL operator* (const MatrixLL &right){
+    T m[this->row * right.col];
+    MatrixLL<T> result(m, this->row, right.col, sizeof(m));
+
+    this->mul(right, result);
+    return result;
   }
 
   /**
    * @brief   Copy operator.
    * @details Check sizes and than copy data element by element
    */
-  Matrix& operator=(const Matrix &src){
+  MatrixLL& operator= (const MatrixLL &src){
     if (this == &src)
       return *this;
 
@@ -262,7 +305,7 @@ public:
   /**
    * @brief   Compare operator. Compare sizes than compare data elements by elements.
    */
-  bool operator==(const Matrix &src){
+  bool operator== (const MatrixLL &src){
     if (this == &src)
       return true;
 
@@ -280,7 +323,7 @@ public:
   /**
    *
    */
-  bool operator!=(const Matrix &src){
+  bool operator!= (const MatrixLL &src){
     return !(this == src);
   }
 
@@ -304,27 +347,27 @@ private:
  * representing matrix with automatically allocated static buffer
  */
 template<typename T, int r, int c>
-class MatrixBuf : public Matrix<T>{
+class MatrixBuf : public MatrixLL<T>{
 protected:
   T m[r*c];
 
 public:
   MatrixBuf(void) :
-    Matrix<T>(m, r, c, sizeof(m))
+    MatrixLL<T>(m, r, c, sizeof(m))
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = 0;
   }
 
   MatrixBuf(const T *initvector) :
-    Matrix<T>(m, r, c, sizeof(m))
+    MatrixLL<T>(m, r, c, sizeof(m))
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = initvector[i];
   }
 
   MatrixBuf(T pattern) :
-    Matrix<T>(m, r, c, sizeof(m))
+    MatrixLL<T>(m, r, c, sizeof(m))
   {
     for (uint32_t i=0; i<(c*r); i++)
       m[i] = pattern;
@@ -333,8 +376,8 @@ public:
   /**
    * @brief   Copy operator.
    */
-  MatrixBuf& operator=(const MatrixBuf &src){
-    Matrix<T>::operator=(src);
+  MatrixBuf& operator= (const MatrixBuf &src){
+    MatrixLL<T>::operator=(src);
     return *this;
   }
 };

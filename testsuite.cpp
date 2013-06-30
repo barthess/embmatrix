@@ -26,8 +26,8 @@ bool compare(const Matrix<T> &src, const Matrix<T> &ref){
     return false;
 
   size_t len = ref.getCol() * ref.getRow();
-  T *src_m = src.array();
-  T *ref_m = ref.array();
+  T *src_m = src.getArray();
+  T *ref_m = ref.getArray();
 
   for (uint32_t i=0; i<len; i++){
     if (! fuzzy_compare(ref_m[i], src_m[i], 0.0001))
@@ -75,31 +75,31 @@ static void identity(T *a, size_t n){
  * @brief identity_mul_test
  */
 template <typename T>
-static void identity_mul_test(Matrix<T> *A, Matrix<T> *I, Matrix<T> *Tmp){
-  std::cout << "identity multiplication test size: " << A->getCol() << "\n";
-  A->mul(I, Tmp);
-  assert(compare(*A, *Tmp));
+static void identity_mul_test(Matrix<T> &A, Matrix<T> &I, Matrix<T> &Tmp){
+  std::cout << "identity multiplication test size: " << A.getCol() << "\n";
+  A.mul(I, Tmp);
+  assert(compare(A, Tmp));
 
-  I->mul(A, Tmp);
-  assert(compare(*A, *Tmp));
+  I.mul(A, Tmp);
+  assert(compare(A, Tmp));
 }
 
 template <typename T>
-static void inv_test(Matrix<T> *A, Matrix<T> *B, Matrix<T> *I, Matrix<T> *Tmp){
-  std::cout << "inversion test size: " << A->getCol() << "\n";
+static void inv_test(Matrix<T> &A, Matrix<T> &B, Matrix<T> &I, Matrix<T> &Tmp){
+  std::cout << "inversion test size: " << A.getCol() << "\n";
 
-  *Tmp = *A;
-  A->inverse();
-  A->inverse();
-  assert(compare(*A, *Tmp));
+  Tmp = A;
+  A.inverse();
+  A.inverse();
+  assert(compare(A, Tmp));
 
-  *A = *Tmp;
-  A->inverse();
-  A->mul(Tmp, B);
-  assert(compare(*B, *I));
+  A = Tmp;
+  A.inverse();
+  A.mul(Tmp, B);
+  assert(compare(B, I));
 
-  Tmp->mul(A, B);
-  assert(compare(*B, *I));
+  Tmp.mul(A, B);
+  assert(compare(B, I));
 }
 
 /**
@@ -128,14 +128,41 @@ static void base_test(void){
     Matrix<double> *TMP = new Matrix<double>(c, m, m, S);
     Matrix<double> *I = new Matrix<double>(i, m, m, S);
 
-    identity_mul_test(A, I, TMP);
-    inv_test(A, B, I, TMP);
+    identity_mul_test(*A, *I, *TMP);
+    inv_test(*A, *B, *I, *TMP);
 
     delete B;
     delete A;
     delete TMP;
     delete I;
   }
+
+  MatrixBuf<float, 3, 3> M;
+  const float Mv[] = {1,2,3, 4,5,6, 7,8,9};
+  M.init(Mv);
+
+  MatrixBuf<float, 3, 3> N;
+  const float Nv[] = {1,0,0, 0,1,0, 0,0,1};
+  N.init(Nv);
+
+  float mm[9];
+  Matrix<float> R(mm, 3, 3, sizeof(mm));
+  R = M + N;
+
+  for (int i=0; i<9; i++){
+    std::cout << mm[i];
+  }
+
+  R = ~M;
+  std::cout << "\n";
+
+  for (int i=0; i<9; i++){
+    std::cout << mm[i];
+  }
+
+  /**/
+  Vector<float, 3> V(Mv);
+  R = N * V;
 }
 
 /**

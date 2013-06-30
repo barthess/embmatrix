@@ -5,6 +5,7 @@
 
 #include "lib/primitives.hpp"
 #include "lib/base.hpp"
+#include "lib/vector.hpp"
 
 
 #endif /* MATRIX_HPP_ */
