@@ -1,12 +1,9 @@
 platform.h
-
 matrix_primitives.hpp
-
 matrix_unsafe.hpp
 matrix.hpp
 vector_unsafe.hpp
 vector.hpp
 quaternion.hpp
 vector3d.hpp
-
 testsuite.cpp
