@@ -14,24 +14,18 @@ protected:
 
 public:
   Vector(void) :
-    Matrix<T, 1, N>(m, 1, N, sizeof(m))
+    Matrix<T, 1, N>()
   {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = 0;
   }
 
   Vector(const T *initvector) :
-    Matrix<T, 1, N>(m, 1, N, sizeof(m))
+    Matrix<T, 1, N>(initvector)
   {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = initvector[i];
   }
 
   Vector(T pattern) :
-    Matrix<T, 1, N>(m, 1, N, sizeof(m))
+    Matrix<T, 1, N>(pattern)
   {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = pattern;
   }
 
   /**
@@ -45,7 +39,7 @@ public:
    * @return pointer to the element.
    */
   T& operator() (const uint32_t v){
-    matrixDbgCheck(v < sizeof(m)/sizeof(m[0]), "overflow");
+    matrixDbgCheck(v < N, "overflow");
     return this->m[v];
   }
 
@@ -55,7 +49,7 @@ public:
    * @return the element.
    */
   T operator() (const uint32_t v) const{
-    matrixDbgCheck(v < sizeof(m)/sizeof(m[0]), "overflow");
+    matrixDbgCheck(v < N, "overflow");
     return this->m[v];
   }
 

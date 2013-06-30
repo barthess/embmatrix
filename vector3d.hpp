@@ -1,5 +1,5 @@
-#ifndef VECTOR3D_NEW_HPP_
-#define VECTOR3D_NEW_HPP_
+#ifndef VECTOR3D_HPP_
+#define VECTOR3D_HPP_
 
 #include "vector.hpp"
 
@@ -75,4 +75,4 @@ public:
 
 
 
-#endif /* VECTOR3D_NEW_HPP_ */
+#endif /* VECTOR3D_HPP_ */

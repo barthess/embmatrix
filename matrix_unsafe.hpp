@@ -78,14 +78,14 @@ public:
    * Modulus
    */
   T mod(void) const {
-    return matrix_modulus(this, (col * row));
+    return matrix_modulus(this->m, (col * row));
   }
 
   /**
    * normalize
    */
   void norm(void){
-    matrix_normalize(this, (col * row));
+    matrix_normalize(this->m, (col * row));
   }
 
   /**

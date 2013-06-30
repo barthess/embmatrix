@@ -11,6 +11,7 @@
  * WARNING!!! no size checks
  ******************************************************************************
  */
+
 /**
  * @brief   Matrix modulus.
  */
@@ -18,7 +19,7 @@ template <typename T>
 T matrix_modulus(const T *A, uint32_t len){
   T R = 0;
   for (uint32_t i=0; i<len; i++)
-    R += A->m[i] * A->m[i];
+    R += A[i] * A[i];
   return sqrt(R);
 }
 
@@ -154,6 +155,71 @@ int32_t matrix_inverse(int32_t n, T *A){
     }
   }
   return 1;
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+// Old vector3d code.
+// Need to replace it by new matrix code
+/////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief   calcuate vector dot-product  c = a . b
+ */
+template <typename T>
+T vector3d_dot(const T *a, T *b) {
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
+/**
+ * @brief   calcuate vector cross-product  c = a x b
+ */
+template <typename T>
+void vector3d_cross(const T *a, const T *b, T *c){
+  c[0] = a[1]*b[2] - a[2]*b[1];
+  c[1] = a[2]*b[0] - a[0]*b[2];
+  c[2] = a[0]*b[1] - a[1]*b[0];
+}
+
+/**
+ * @brief   convert vector to a vector with same direction and modulus 1
+ */
+template <typename T>
+void vector3d_normalize(T* v){
+  T R = matrix_modulus(v, 3);
+  v[0] /= R;
+  v[1] /= R;
+  v[2] /= R;
+}
+
+/**
+ * @brief   calcuate vector scalar-product  b = s x a
+ */
+template <typename T>
+void vector3d_scale(const T s, const T *a, T *b){
+  b[0] = s*a[0];
+  b[1] = s*a[1];
+  b[2] = s*a[2];
+}
+
+/**
+ * @brief   calcuate vector sum   c = a + b
+ */
+template <typename T>
+void vector3d_add(const T *a, const T *b, T *c){
+  c[0] = a[0] + b[0];
+  c[1] = a[1] + b[1];
+  c[2] = a[2] + b[2];
+}
+
+/**
+ * @brief   calcuate vector substraction c = a - b
+ */
+template <typename T>
+void vector3d_sub(const T *a, const T *b, T *c){
+  c[0] = a[0] - b[0];
+  c[1] = a[1] - b[1];
+  c[2] = a[2] - b[2];
 }
 
 #endif /* MATRIX_PRIMITIVES_H */

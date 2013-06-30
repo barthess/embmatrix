@@ -1,7 +1,7 @@
 #ifndef MATRIX_DBG_HPP_
 #define MATRIX_DBG_HPP_
 
-#if defined(CHIBI_OS)
+#if defined(_CHIBIOS_RT_)
   #define matrixDbgCheck(a,b) chDbgCheck(a,b)
   #include "misc_math.hpp"
 #else

@@ -82,7 +82,7 @@ public:
    * @brief   Convert quaternion to euler angles.
    */
   void euler(Vector<T, 3> *e){
-    Quat2Euler(this->m, e->array());
+    Quat2Euler(this->m, e->getArray());
   }
 
   /**

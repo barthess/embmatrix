@@ -7,14 +7,14 @@
  * Convenient class
  * 1-d matrix
  */
-template<typename T>
+template<typename T, int N>
 class VectorUnsafe : public MatrixUnsafe<T>{
 protected:
   T *m;
 
 public:
-  VectorUnsafe(T *m, uint32_t c, size_t bufsize) :
-    MatrixUnsafe<T>(m, 1, c, bufsize)
+  VectorUnsafe(T *m, size_t bufsize) :
+    MatrixUnsafe<T>(m, 1, N, bufsize)
   {
   }
 
@@ -29,7 +29,7 @@ public:
    * @return pointer to the element.
    */
   T& operator() (const uint32_t v){
-    matrixDbgCheck(v < sizeof(m)/sizeof(m[0]), "overflow");
+    matrixDbgCheck(v < N, "overflow");
     return this->m[v];
   }
 
@@ -39,7 +39,7 @@ public:
    * @return the element.
    */
   T operator() (const uint32_t v) const{
-    matrixDbgCheck(v < sizeof(m)/sizeof(m[0]), "overflow");
+    matrixDbgCheck(v < N, "overflow");
     return this->m[v];
   }
 
