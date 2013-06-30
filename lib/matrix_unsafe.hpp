@@ -1,5 +1,5 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef MATRIX_UNSAFE_H
+#define MATRIX_UNSAFE_H
 
 #include <cstddef>
 
@@ -8,7 +8,7 @@
  * @note        Dangerouse. Use it if you want create interleaved matrixes.
  */
 template<typename T>
-class MatrixLL{
+class MatrixUnsafe{
 public:
   /**
    * @brief Constructor
@@ -19,7 +19,7 @@ public:
    * @param[in] bufsize   size of data array in bytes. Need to check correctness
    *                      of sizes
    */
-  MatrixLL(T *m, uint32_t r, uint32_t c, size_t bufsize){
+  MatrixUnsafe(T *m, uint32_t r, uint32_t c, size_t bufsize){
     matrixDbgCheck(((0 != r) && (0 != c)), "Zero sizes forbidden");
     matrixDbgCheck(bufsize == (r * c * sizeof(T)), "Probable overflow");
     this->m = m;
@@ -30,7 +30,7 @@ public:
   /**
    * @brief Copy constructor. Forbidden.
    */
-  MatrixLL(const MatrixLL &m);
+  MatrixUnsafe(const MatrixUnsafe &m);
 
   /**
    * Initialize matrix using vector of values starting from 0th element
@@ -114,7 +114,7 @@ public:
   /**
    * Trnaspose matrix storing result in different matrix
    */
-  void transpose(MatrixLL *result){
+  void transpose(MatrixUnsafe *result){
     matrixDbgCheck(result != this, "this functions can not work inplace");
     matrixDbgCheck((col == result->row) && (row == result->col),
         "matrix sizes incorrect");
@@ -125,9 +125,9 @@ public:
   /**
    * Trnaspose matrix
    */
-  MatrixLL operator~ (void){
+  MatrixUnsafe operator~ (void){
     T m[this->col * this->row];
-    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+    MatrixUnsafe<T> result(m, this->col, this->row, sizeof(m));
 
     this->transpose(&result);
     return result;
@@ -179,7 +179,7 @@ public:
   /**
    *
    */
-  void operator += (const MatrixLL &M){
+  void operator += (const MatrixUnsafe &M){
     matrixDbgCheck((M.col == col) && (M.row == row), "matrix sizes must be same");
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++){
@@ -190,9 +190,9 @@ public:
   /**
    *
    */
-  MatrixLL operator + (const MatrixLL &M){
+  MatrixUnsafe operator + (const MatrixUnsafe &M){
     T m[this->col * this->row];
-    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+    MatrixUnsafe<T> result(m, this->col, this->row, sizeof(m));
     result = *this;
     result += M;
     return result;
@@ -211,7 +211,7 @@ public:
   /**
    *
    */
-  void operator -= (const MatrixLL &M){
+  void operator -= (const MatrixUnsafe &M){
     matrixDbgCheck((M.col == col) && (M.row == row), "matrix sizes must be same");
     uint32_t len = col * row;
     for (uint32_t i=0; i<len; i++){
@@ -222,9 +222,9 @@ public:
   /**
    *
    */
-  MatrixLL operator - (const MatrixLL &M){
+  MatrixUnsafe operator - (const MatrixUnsafe &M){
     T m[this->col * this->row];
-    MatrixLL<T> result(m, this->col, this->row, sizeof(m));
+    MatrixUnsafe<T> result(m, this->col, this->row, sizeof(m));
     result = *this;
     result -= M;
     return result;
@@ -264,7 +264,7 @@ public:
    * @param[in] right     multiplier
    * @param[out] result   place result in it
    */
-  void mul(const MatrixLL &right, MatrixLL &result){
+  void mul(const MatrixUnsafe &right, MatrixUnsafe &result){
 
     matrixDbgCheck(((this->col == right.row) &&
                 (result.row == this->row) &&
@@ -278,9 +278,9 @@ public:
    * @brief   Multiply operator
    * @param[in] right     multiplier
    */
-  MatrixLL operator* (const MatrixLL &right){
+  MatrixUnsafe operator* (const MatrixUnsafe &right){
     T m[this->row * right.col];
-    MatrixLL<T> result(m, this->row, right.col, sizeof(m));
+    MatrixUnsafe<T> result(m, this->row, right.col, sizeof(m));
 
     this->mul(right, result);
     return result;
@@ -290,7 +290,7 @@ public:
    * @brief   Copy operator.
    * @details Check sizes and than copy data element by element
    */
-  MatrixLL& operator= (const MatrixLL &src){
+  MatrixUnsafe& operator= (const MatrixUnsafe &src){
     if (this == &src)
       return *this;
 
@@ -305,7 +305,7 @@ public:
   /**
    * @brief   Compare operator. Compare sizes than compare data elements by elements.
    */
-  bool operator== (const MatrixLL &src){
+  bool operator== (const MatrixUnsafe &src){
     if (this == &src)
       return true;
 
@@ -323,7 +323,7 @@ public:
   /**
    *
    */
-  bool operator!= (const MatrixLL &src){
+  bool operator!= (const MatrixUnsafe &src){
     return !(this == src);
   }
 
@@ -341,46 +341,4 @@ private:
   T *m;
 };
 
-
-/**
- * Convenient class
- * representing matrix with automatically allocated static buffer
- */
-template<typename T, int r, int c>
-class MatrixBuf : public MatrixLL<T>{
-protected:
-  T m[r*c];
-
-public:
-  MatrixBuf(void) :
-    MatrixLL<T>(m, r, c, sizeof(m))
-  {
-    for (uint32_t i=0; i<(c*r); i++)
-      m[i] = 0;
-  }
-
-  MatrixBuf(const T *initvector) :
-    MatrixLL<T>(m, r, c, sizeof(m))
-  {
-    for (uint32_t i=0; i<(c*r); i++)
-      m[i] = initvector[i];
-  }
-
-  MatrixBuf(T pattern) :
-    MatrixLL<T>(m, r, c, sizeof(m))
-  {
-    for (uint32_t i=0; i<(c*r); i++)
-      m[i] = pattern;
-  }
-
-  /**
-   * @brief   Copy operator.
-   */
-  MatrixBuf& operator= (const MatrixBuf &src){
-    MatrixLL<T>::operator=(src);
-    return *this;
-  }
-};
-
-
-#endif /* MATRIX_H */
+#endif /* MATRIX_UNSAFE_H */
