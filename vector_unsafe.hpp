@@ -1,43 +1,27 @@
-#ifndef VECTOR_NEW_HPP_
-#define VECTOR_NEW_HPP_
+#ifndef VECTOR_UNSAFE_HPP_
+#define VECTOR_UNSAFE_HPP_
 
-#include "base.hpp"
+#include "matrix_unsafe.hpp"
 
 /**
  * Convenient class
  * 1-d matrix
  */
-template<typename T, int N>
-class Vector : public MatrixLL<T>{
+template<typename T>
+class VectorUnsafe : public MatrixUnsafe<T>{
 protected:
-  T m[N];
+  T *m;
 
 public:
-  Vector(void) :
-    MatrixLL<T>(m, N, 1, sizeof(m))
+  VectorUnsafe(T *m, uint32_t c, size_t bufsize) :
+    MatrixUnsafe<T>(m, 1, c, bufsize)
   {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = 0;
-  }
-
-  Vector(const T *initvector) :
-    MatrixLL<T>(m, N, 1, sizeof(m))
-  {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = initvector[i];
-  }
-
-  Vector(T pattern) :
-    MatrixLL<T>(m, N, 1, sizeof(m))
-  {
-    for (uint32_t i=0; i<N; i++)
-      m[i] = pattern;
   }
 
   /**
    * @brief Copy constructor. Forbidden.
    */
-  Vector(const Vector &v);
+  VectorUnsafe(const VectorUnsafe &v);
 
   /**
    * @brief Subindex for Matrix elements assignation. Single dimension variant.
@@ -62,10 +46,10 @@ public:
   /**
    * @brief   Copy operator.
    */
-  Vector& operator=(const Vector &src){
-    MatrixLL<T>::operator =(src);
+  VectorUnsafe& operator=(const VectorUnsafe &src){
+    MatrixUnsafe<T>::operator =(src);
     return *this;
   }
 };
 
-#endif /* VECTOR_NEW_HPP_ */
+#endif /* VECTOR_UNSAFE_HPP_ */

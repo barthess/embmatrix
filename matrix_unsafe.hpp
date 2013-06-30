@@ -1,7 +1,10 @@
 #ifndef MATRIX_UNSAFE_H
 #define MATRIX_UNSAFE_H
 
+#include <stdint.h>
 #include <cstddef>
+#include "platform.h"
+#include "matrix_primitives.hpp"
 
 /**
  * @brief       Low level matrix class.
@@ -74,23 +77,15 @@ public:
   /**
    * Modulus
    */
-  T modulus(void) const {
-    T R = 0;
-    uint32_t len = col * row;
-    for (uint32_t i=0; i<len; i++)
-      R += this->m[i] * this->m[i];
-    return sqrt(R);
+  T mod(void) const {
+    return matrix_modulus(this, (col * row));
   }
 
   /**
    * normalize
    */
-  void normalize(void){
-    T R = this->modulus();
-    matrixDbgCheck((R > 0), "divizion by zero");
-    uint32_t len = col * row;
-    for (uint32_t i=0; i<len; i++)
-      this->m[i] /= R;
+  void norm(void){
+    matrix_normalize(this, (col * row));
   }
 
   /**
@@ -100,6 +95,18 @@ public:
   int32_t inverse(void){
     matrixDbgCheck(this->col == this->row, "matrix must be square");
     return matrix_inverse(static_cast<int32_t>(this->col), this->m);
+  }
+
+  /**
+   * @brief operator !
+   * @return inverse matrix
+   */
+  MatrixUnsafe operator !(void){
+    T m[this->row * this->col];
+    MatrixUnsafe result(m, this->row, this->col, sizeof(m));
+    result = *this;
+    result.inverse();
+    return result;
   }
 
   /**

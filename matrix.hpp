@@ -4,9 +4,9 @@
 #include "matrix_unsafe.hpp"
 
 /**
- * Convenient class
- * representing matrix with automatically allocated static buffer
- */
+* Convenient class
+* representing matrix with automatically allocated static buffer
+*/
 template<typename T, int r, int c>
 class Matrix : public MatrixUnsafe<T>{
 protected:
@@ -35,12 +35,13 @@ public:
   }
 
   /**
-   * @brief   Copy operator.
+   * @brief Copy operator.
    */
-  Matrix& operator= (const Matrix &src){
+  Matrix& operator=(const Matrix &src){
     MatrixUnsafe<T>::operator=(src);
     return *this;
   }
 };
+
 
 #endif // MATRIX_HPP

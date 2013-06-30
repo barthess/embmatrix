@@ -1,34 +1,34 @@
-#ifndef VECTOR_NEW_HPP_
-#define VECTOR_NEW_HPP_
+#ifndef VECTOR_HPP_
+#define VECTOR_HPP_
 
-#include "base.hpp"
+#include "matrix.hpp"
 
 /**
  * Convenient class
  * 1-d matrix
  */
 template<typename T, int N>
-class Vector : public Matrix<T>{
+class Vector : public Matrix<T, 1, N>{
 protected:
   T m[N];
 
 public:
   Vector(void) :
-    Matrix<T>(m, N, 1, sizeof(m))
+    Matrix<T, 1, N>(m, 1, N, sizeof(m))
   {
     for (uint32_t i=0; i<N; i++)
       m[i] = 0;
   }
 
   Vector(const T *initvector) :
-    Matrix<T>(m, N, 1, sizeof(m))
+    Matrix<T, 1, N>(m, 1, N, sizeof(m))
   {
     for (uint32_t i=0; i<N; i++)
       m[i] = initvector[i];
   }
 
   Vector(T pattern) :
-    Matrix<T>(m, N, 1, sizeof(m))
+    Matrix<T, 1, N>(m, 1, N, sizeof(m))
   {
     for (uint32_t i=0; i<N; i++)
       m[i] = pattern;
@@ -63,9 +63,9 @@ public:
    * @brief   Copy operator.
    */
   Vector& operator=(const Vector &src){
-    Matrix<T>::operator =(src);
+    Matrix<T, 1, N>::operator =(src);
     return *this;
   }
 };
 
-#endif /* VECTOR_NEW_HPP_ */
+#endif /* VECTOR_HPP_ */

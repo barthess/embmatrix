@@ -2,26 +2,52 @@
 #define MATRIX_PRIMITIVES_H
 
 #include <stdint.h>
+#include <string.h> // for memcpy()
 
 /*
  ******************************************************************************
- * LOWEST LEVEL
- * Hi speed primitive functions.
+ * LOW LEVEL
+ * Hi speed functions.
  * WARNING!!! no size checks
  ******************************************************************************
  */
-//transpose matrix A (m x n)  to  B (n x m)
+/**
+ * @brief   Matrix modulus.
+ */
 template <typename T>
-void matrix_transpose(const uint32_t m , const uint32_t n, const T *A,  T *B){
+T matrix_modulus(const T *A, uint32_t len){
+  T R = 0;
+  for (uint32_t i=0; i<len; i++)
+    R += A->m[i] * A->m[i];
+  return sqrt(R);
+}
+
+/**
+ * @brief   Normalize matrix inplace.
+ */
+template <typename T>
+void matrix_normalize(T *A, uint32_t len){
+  T R = matrix_modulus(A, len);
+  for (uint32_t i=0; i<len; i++)
+    A[i] /= R;
+}
+
+/**
+ * @brief     transpose matrix A(m x n) to B(n x m)
+ */
+template <typename T>
+void matrix_transpose(uint32_t m, uint32_t n, const T *A, T *B){
   uint32_t i, j;
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
       B[j*m + i] = A[i*n + j];
 }
 
-//multiply matrix A (m x p) by  B(p x n) , put result in C (m x n)
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ */
 template <typename T>
-void matrix_multiply(const uint32_t m, const uint32_t p, const uint32_t n ,
+void matrix_multiply(uint32_t m, uint32_t p, uint32_t n,
                      const T *A, const T *B, T *C){
   uint32_t i, j, k;
   for(i=0; i<m; i++){     //each row in A
@@ -34,9 +60,11 @@ void matrix_multiply(const uint32_t m, const uint32_t p, const uint32_t n ,
   }
 }
 
-// Same as previouse but A is matrix of pointers to values
+/**
+ * @brief   Same as previouse but A is matrix of pointers to values
+ */
 template <typename T>
-void matrix_multiply(const uint32_t m, const uint32_t p, const uint32_t n ,
+void matrix_multiply(uint32_t m,  uint32_t p, uint32_t n,
                      const T **A, const T *B, T *C){
   uint32_t i, j, k;
   for(i=0; i<m; i++){     //each row in A
@@ -49,12 +77,12 @@ void matrix_multiply(const uint32_t m, const uint32_t p, const uint32_t n ,
   }
 }
 
+/**
+ * @brief   Copy function
+ */
 template <typename T>
-void matrix_copy(const uint32_t m, const uint32_t n, const T *A, T *B ){
-  uint32_t i, j;
-  for(i=0; i<m; i++)
-    for(j=0; j<n; j++)
-      B[i*n + j] = A[i*n + j];
+void matrix_copy(uint32_t m, uint32_t n, const T *A, T *B){
+  memcpy(B, A, (m * n * sizeof(A[0])));
 }
 
 // Matrix Inversion Routine from http://www.arduino.cc/playground/Code/MatrixMath

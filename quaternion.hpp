@@ -1,7 +1,7 @@
 #ifndef QUATERNION_HPP_
 #define QUATERNION_HPP_
 
-#include "vector_new.hpp"
+#include "vector.hpp"
 
 template <typename T>
 void Quat2Euler(const T *q, T *e){
@@ -33,7 +33,7 @@ public:
     this->m[1] = 0;
     this->m[2] = 0;
     this->m[3] = 0;
-  };
+  }
 
   Quaternion(T q0, T q1, T q2, T q3) :
     Vector<T, 4>()
@@ -42,17 +42,17 @@ public:
     this->m[1] = q1;
     this->m[2] = q2;
     this->m[3] = q3;
-  };
+  }
 
   Quaternion(const T *initvector) :
     Vector<T, 4>(initvector)
   {
-  };
+  }
 
   Quaternion(T pattern) :
     Vector<T, 4>(pattern)
   {
-  };
+  }
 
   /**
    * @brief Copy constructor. Forbidden.
@@ -66,7 +66,7 @@ public:
     this->m[1] = -this->m[1];
     this->m[2] = -this->m[1];
     this->m[3] = -this->m[1];
-  };
+  }
 
   /**
    * @brief   complex conjugate.
@@ -76,14 +76,14 @@ public:
     result->m[1] = -this->m[1];
     result->m[2] = -this->m[2];
     result->m[3] = -this->m[3];
-  };
+  }
 
   /**
    * @brief   Convert quaternion to euler angles.
    */
   void euler(Vector<T, 3> *e){
     Quat2Euler(this->m, e->array());
-  };
+  }
 
   /**
    * @brief Quaternion multiplications
@@ -100,7 +100,7 @@ public:
     res[1] = m[1]*r[0] + m[0]*r[1] - m[3]*r[2] + m[2]*r[3];
     res[2] = m[2]*r[0] + m[3]*r[1] + m[0]*r[2] - m[1]*r[3];
     res[3] = m[3]*r[0] - m[2]*r[1] + m[1]*r[2] + m[0]*r[3];
-  };
+  }
 
   /**
    * @brief   Copy operator.

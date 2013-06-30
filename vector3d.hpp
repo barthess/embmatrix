@@ -1,7 +1,7 @@
 #ifndef VECTOR3D_NEW_HPP_
 #define VECTOR3D_NEW_HPP_
 
-#include "vector_new.hpp"
+#include "vector.hpp"
 
 /**
  * Vector3d.
@@ -14,7 +14,7 @@ public:
   Vector3d(void) :
     Vector<T, 3>()
   {
-  };
+  }
 
   Vector3d(T m0, T m1, T m2) :
     Vector<T, 3>()
@@ -22,17 +22,18 @@ public:
     this->m[0] = m0;
     this->m[1] = m1;
     this->m[2] = m2;
-  };
+  }
 
   Vector3d(const T *initvector) :
     Vector<T, 3>(initvector)
   {
-  };
+  }
 
   Vector3d(const T pattern) :
     Vector<T, 3>(pattern)
   {
-  };
+  }
+
   /**
    * @brief Copy constructor. Forbidden.
    */

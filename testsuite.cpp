@@ -2,6 +2,7 @@
 
 #include "string.h"
 #include "matrix.hpp"
+#include "vector_unsafe.hpp"
 
 /**
  * @brief   Fuzzy compare float values
@@ -21,7 +22,7 @@ bool fuzzy_compare(T reference, T val, T clearance){
  * @return
  */
 template <typename T>
-bool compare(const Matrix<T> &src, const Matrix<T> &ref){
+bool compare(const MatrixUnsafe<T> &src, const MatrixUnsafe<T> &ref){
   if((src.getCol() != ref.getCol()) || (src.getRow() != ref.getRow()))
     return false;
 
@@ -75,7 +76,7 @@ static void identity(T *a, size_t n){
  * @brief identity_mul_test
  */
 template <typename T>
-static void identity_mul_test(Matrix<T> &A, Matrix<T> &I, Matrix<T> &Tmp){
+static void identity_mul_test(MatrixUnsafe<T> &A, MatrixUnsafe<T> &I, MatrixUnsafe<T> &Tmp){
   std::cout << "identity multiplication test size: " << A.getCol() << "\n";
   A.mul(I, Tmp);
   assert(compare(A, Tmp));
@@ -85,7 +86,7 @@ static void identity_mul_test(Matrix<T> &A, Matrix<T> &I, Matrix<T> &Tmp){
 }
 
 template <typename T>
-static void inv_test(Matrix<T> &A, Matrix<T> &B, Matrix<T> &I, Matrix<T> &Tmp){
+static void inv_test(MatrixUnsafe<T> &A, MatrixUnsafe<T> &B, MatrixUnsafe<T> &I, MatrixUnsafe<T> &Tmp){
   std::cout << "inversion test size: " << A.getCol() << "\n";
 
   Tmp = A;
@@ -123,10 +124,10 @@ static void base_test(void){
     memcpy(b, a, S);
     memcpy(c, a, S);
 
-    Matrix<double> *A = new Matrix<double>(a, m, m, S);
-    Matrix<double> *B = new Matrix<double>(b, m, m, S);
-    Matrix<double> *TMP = new Matrix<double>(c, m, m, S);
-    Matrix<double> *I = new Matrix<double>(i, m, m, S);
+    MatrixUnsafe<double> *A = new MatrixUnsafe<double>(a, m, m, S);
+    MatrixUnsafe<double> *B = new MatrixUnsafe<double>(b, m, m, S);
+    MatrixUnsafe<double> *TMP = new MatrixUnsafe<double>(c, m, m, S);
+    MatrixUnsafe<double> *I = new MatrixUnsafe<double>(i, m, m, S);
 
     identity_mul_test(*A, *I, *TMP);
     inv_test(*A, *B, *I, *TMP);
@@ -137,16 +138,16 @@ static void base_test(void){
     delete I;
   }
 
-  MatrixBuf<float, 3, 3> M;
+  Matrix<float, 3, 3> M;
   const float Mv[] = {1,2,3, 4,5,6, 7,8,9};
   M.init(Mv);
 
-  MatrixBuf<float, 3, 3> N;
+  Matrix<float, 3, 3> N;
   const float Nv[] = {1,0,0, 0,1,0, 0,0,1};
   N.init(Nv);
 
   float mm[9];
-  Matrix<float> R(mm, 3, 3, sizeof(mm));
+  MatrixUnsafe<float> R(mm, 3, 3, sizeof(mm));
   R = M + N;
 
   for (int i=0; i<9; i++){
@@ -161,7 +162,9 @@ static void base_test(void){
   }
 
   /**/
-  Vector<float, 3> V(Mv);
+  float vect[3];
+  VectorUnsafe<float> V(vect, 3, sizeof(vect));
+  V.init(Mv);
   R = N * V;
 }
 
