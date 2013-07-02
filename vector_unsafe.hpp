@@ -2,6 +2,7 @@
 #define VECTOR_UNSAFE_HPP_
 
 #include "matrix_unsafe.hpp"
+namespace matrix {
 
 /**
  * Convenient class
@@ -9,9 +10,6 @@
  */
 template<typename T, int N>
 class VectorUnsafe : public MatrixUnsafe<T>{
-protected:
-  T *m;
-
 public:
   VectorUnsafe(T *m, size_t bufsize) :
     MatrixUnsafe<T>(m, 1, N, bufsize)
@@ -52,4 +50,5 @@ public:
   }
 };
 
+} //namespace matrix
 #endif /* VECTOR_UNSAFE_HPP_ */

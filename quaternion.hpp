@@ -2,7 +2,11 @@
 #define QUATERNION_HPP_
 
 #include "vector.hpp"
+namespace matrix {
 
+/**
+ *
+ */
 template <typename T>
 void Quat2Euler(const T *q, T *e){
   T Rlb23, Rlb22, Rlb31, Rlb11, Rlb21;
@@ -111,4 +115,5 @@ public:
   }
 };
 
+} //namespace matrix
 #endif /* QUATERNION_HPP_ */

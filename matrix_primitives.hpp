@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h> // for memcpy()
 
+namespace matrix {
+
 /*
  ******************************************************************************
  * LOW LEVEL
@@ -221,5 +223,7 @@ void vector3d_sub(const T *a, const T *b, T *c){
   c[1] = a[1] - b[1];
   c[2] = a[2] - b[2];
 }
+
+} //namespace matrix
 
 #endif /* MATRIX_PRIMITIVES_H */

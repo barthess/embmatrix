@@ -2,6 +2,7 @@
 #define VECTOR_HPP_
 
 #include "matrix.hpp"
+namespace matrix {
 
 /**
  * Convenient class
@@ -9,9 +10,6 @@
  */
 template<typename T, int N>
 class Vector : public Matrix<T, 1, N>{
-protected:
-  T m[N];
-
 public:
   Vector(void) :
     Matrix<T, 1, N>()
@@ -62,4 +60,5 @@ public:
   }
 };
 
+}// namespace matrix
 #endif /* VECTOR_HPP_ */

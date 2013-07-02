@@ -5,6 +5,8 @@
 #include <cstddef>
 #include "platform.h"
 #include "matrix_primitives.hpp"
+namespace matrix {
+
 
 /**
  * @brief       Low level matrix class.
@@ -247,6 +249,16 @@ public:
   }
 
   /**
+   * Scale matrix elemets by constant
+   */
+  void operator /= (const T v){
+    matrixDbgCheck(0 != v, "division by zero");
+    uint32_t len = col * row;
+    for (uint32_t i=0; i<len; i++)
+      this->m[i] /= v;
+  }
+
+  /**
    * @brief Subindex for Matrix elements assignation.
    * @param r
    * @param c
@@ -348,4 +360,5 @@ private:
   T *m;
 };
 
+} // namespace matrix
 #endif /* MATRIX_UNSAFE_H */

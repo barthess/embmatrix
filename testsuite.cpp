@@ -3,6 +3,7 @@
 #include "string.h"
 #include "matrix.hpp"
 #include "vector_unsafe.hpp"
+using namespace matrix;
 
 /**
  * @brief   Fuzzy compare float values

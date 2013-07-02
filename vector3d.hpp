@@ -2,6 +2,7 @@
 #define VECTOR3D_HPP_
 
 #include "vector.hpp"
+namespace matrix {
 
 /**
  * Vector3d.
@@ -73,6 +74,32 @@ public:
   }
 };
 
+/**
+ *
+ */
+template <typename T>
+T dot(const Vector3d<T> &left, const Vector3d<T> &right){
+  T *a = left->m;
+  T *b = right->m;
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
 
+/**
+ * cross product in right handed 3-d space
+ */
+template <typename T>
+Vector3d<T> cross(const Vector3d<T> &left, const Vector3d<T> &right){
+  Vector3d<T> result;
+  T *res = result->m;
+  T *b   = right->m;
+  T *m   = left->m;
 
+  res[0] = m[1]*b[2] - m[2]*b[1];
+  res[1] = m[2]*b[0] - m[0]*b[2];
+  res[2] = m[0]*b[1] - m[1]*b[0];
+
+  return result;
+}
+
+} // namespace matrix
 #endif /* VECTOR3D_HPP_ */

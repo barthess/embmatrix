@@ -2,11 +2,12 @@
 #define MATRIX_HPP
 
 #include "matrix_unsafe.hpp"
+namespace matrix {
 
 /**
-* Convenient class
-* representing matrix with automatically allocated static buffer
-*/
+ * Convenient class
+ * representing matrix with automatically allocated static buffer
+ */
 template<typename T, int r, int c>
 class Matrix : public MatrixUnsafe<T>{
 protected:
@@ -43,5 +44,5 @@ public:
   }
 };
 
-
+} // namespace matrix
 #endif // MATRIX_HPP
