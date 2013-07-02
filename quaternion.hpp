@@ -68,8 +68,8 @@ public:
    */
   void ccon(void){
     this->m[1] = -this->m[1];
-    this->m[2] = -this->m[1];
-    this->m[3] = -this->m[1];
+    this->m[2] = -this->m[2];
+    this->m[3] = -this->m[3];
   }
 
   /**
@@ -85,7 +85,7 @@ public:
   /**
    * @brief   Convert quaternion to euler angles.
    */
-  void euler(Vector<T, 3> *e){
+  void euler(Vector<T, 3> *e) const {
     Quat2Euler(this->m, e->getArray());
   }
 
