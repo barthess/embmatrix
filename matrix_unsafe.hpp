@@ -128,7 +128,7 @@ public:
     matrixDbgCheck((col == result->row) && (row == result->col),
         "matrix sizes incorrect");
 
-    matrix_transpose(col, row, m, result->m);
+    matrix_transpose(row, col, m, result->m);
   }
 
   /**
