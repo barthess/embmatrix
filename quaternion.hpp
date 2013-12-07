@@ -2,6 +2,7 @@
 #define QUATERNION_HPP_
 
 #include "vector.hpp"
+#include "vector3d.hpp"
 namespace matrix {
 
 /**
@@ -92,13 +93,13 @@ public:
   /**
    * @brief Quaternion multiplications
    */
-  void mul(const Quaternion<T> *right, Quaternion<T> *result){
+  void mul(const Quaternion<T> *right, Quaternion<T> *result) const {
     chDbgCheck(((this != right) && (this != result) && (result != right)),
         "this function can not work inplace");
 
     const T *r = right->m;
+    const T *m = this->m;
     T *res = result->m;
-    T *m = this->m;
 
     res[0] = m[0]*r[0] - m[1]*r[1] - m[2]*r[2] - m[3]*r[3];
     res[1] = m[1]*r[0] + m[0]*r[1] - m[3]*r[2] + m[2]*r[3];
@@ -114,6 +115,75 @@ public:
     return *this;
   }
 };
+
+/**
+ *
+ */
+template<typename T>
+Quaternion<T> Qmul(const Quaternion<T> *left, const Quaternion<T> *right) {
+  Quaternion<T> res;
+  left->mul(right, &res);
+  return res;
+}
+
+/**
+ *
+ */
+template <typename T>
+void __euler2quat(T *q, const T *eu){
+  T phi05, theta05, psi05;
+  T q_in[4];
+  T cph05, sph05, cth05, sth05, cp05, sp05;
+  T iqn;
+  phi05   = eu[0]/2;
+  theta05 = eu[1]/2;
+  psi05   = eu[2]/2;
+  cph05   = cos(phi05);
+  sph05   = sin(phi05);
+  cth05   = cos(theta05);
+  sth05   = sin(theta05);
+  cp05    = cos(psi05);
+  sp05    = sin(psi05);
+  q_in[0] = cph05*cth05*cp05 + sph05*sth05*sp05;
+  q_in[1] = sph05*cth05*cp05 - cph05*sth05*sp05;
+  q_in[2] = cph05*sth05*cp05 + sph05*cth05*sp05;
+  q_in[3] = cph05*cth05*sp05 - sph05*sth05*cp05;
+
+  iqn = 1/(q_in[0]*q_in[0] + q_in[1]*q_in[1] + q_in[2]*q_in[2] + q_in[3]*q_in[3]);
+
+  // normalize and negate if q0<0
+  for (size_t i=0; i<=3; i++) {
+    q_in[i] = q_in[i] * iqn;
+    if (q_in[0] < 0)
+      q_in[i] = -q_in[i];
+  }
+
+  q[0] = q_in[0];
+  q[1] = q_in[1];
+  q[2] = q_in[2];
+  q[3] = q_in[3];
+}
+
+/**
+ *
+ */
+template <typename T>
+void mEuler2Quat(Quaternion<T> *q, const Vector3d<T> *eu){
+  T *eu_int,*q_int;
+  eu_int = eu->getArray();
+  q_int = q->getArray();
+  __euler2quat<T>(q_int,eu_int);
+}
+
+/**
+ *
+ */
+template<typename T>
+Quaternion<T> Qcon(const Quaternion<T> *q){
+  Quaternion<T> res;
+  q->ccon(&res);
+  return res;
+}
 
 } //namespace matrix
 #endif /* QUATERNION_HPP_ */
