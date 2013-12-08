@@ -94,7 +94,7 @@ public:
    * @brief Quaternion multiplications
    */
   void mul(const Quaternion<T> *right, Quaternion<T> *result) const {
-    chDbgCheck(((this != right) && (this != result) && (result != right)),
+    matrixDbgCheck(((this != right) && (this != result) && (result != right)),
         "this function can not work inplace");
 
     const T *r = right->m;
