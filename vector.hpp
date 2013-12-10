@@ -9,20 +9,20 @@ namespace matrix {
  * 1-d matrix
  */
 template<typename T, int N>
-class Vector : public Matrix<T, 1, N>{
+class Vector : public Matrix<T, N, 1>{
 public:
   Vector(void) :
-    Matrix<T, 1, N>()
+    Matrix<T, N, 1>()
   {
   }
 
   Vector(const T *initvector) :
-    Matrix<T, 1, N>(initvector)
+    Matrix<T, N, 1>(initvector)
   {
   }
 
   Vector(T pattern) :
-    Matrix<T, 1, N>(pattern)
+    Matrix<T, N, 1>(pattern)
   {
   }
 
@@ -55,7 +55,7 @@ public:
    * @brief   Copy operator.
    */
   Vector& operator=(const Vector &src){
-    Matrix<T, 1, N>::operator =(src);
+    Matrix<T, N, 1>::operator =(src);
     return *this;
   }
 };

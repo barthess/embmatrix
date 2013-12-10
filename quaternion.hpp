@@ -8,20 +8,6 @@ namespace matrix {
 /**
  *
  */
-template <typename T>
-void Quat2Euler(const T *q, T *e){
-  T Rlb23, Rlb22, Rlb31, Rlb11, Rlb21;
-
-  Rlb23 = 2 * (q[2] * q[3] - q[0] * q[1]);
-  Rlb22 = q[0]*q[0] - q[1]*q[1] + q[2]*q[2] - q[3]*q[3];
-  Rlb31 = 2 * (q[1] * q[3] - q[0] * q[2]);
-  Rlb11 = q[0]*q[0] + q[1]*q[1] - q[2]*q[2] - q[3]*q[3];
-  Rlb21 = 2 * (q[0] * q[3] + q[1] * q[2]);
-
-  e[0] = -atan2(Rlb23, Rlb22);   //gamma крен
-  e[1] = -atan2(Rlb31, Rlb11);   //psi рыскание
-  e[2] =  asin(Rlb21);          //theta тангаж
-}
 
 /**
  * Quaternion.
@@ -84,13 +70,6 @@ public:
   }
 
   /**
-   * @brief   Convert quaternion to euler angles.
-   */
-  void euler(Vector<T, 3> *e) const {
-    Quat2Euler(this->m, e->getArray());
-  }
-
-  /**
    * @brief Quaternion multiplications
    */
   void mul(const Quaternion<T> *right, Quaternion<T> *result) const {
@@ -130,14 +109,16 @@ Quaternion<T> Qmul(const Quaternion<T> *left, const Quaternion<T> *right) {
  *
  */
 template <typename T>
-void __euler2quat(T *q, const T *eu){
+static void __euler2quat(T *q, const T *eu){
   T phi05, theta05, psi05;
   T q_in[4];
   T cph05, sph05, cth05, sth05, cp05, sp05;
   T iqn;
-  phi05   = eu[0]/2;
-  theta05 = eu[1]/2;
-  psi05   = eu[2]/2;
+  const T cz = 0.0;
+  const T c2 = 2.0;
+  phi05   = eu[0]/c2;
+  theta05 = eu[1]/c2;
+  psi05   = eu[2]/c2;
   cph05   = cos(phi05);
   sph05   = sin(phi05);
   cth05   = cos(theta05);
@@ -149,30 +130,66 @@ void __euler2quat(T *q, const T *eu){
   q_in[2] = cph05*sth05*cp05 + sph05*cth05*sp05;
   q_in[3] = cph05*cth05*sp05 - sph05*sth05*cp05;
 
-  iqn = 1/(q_in[0]*q_in[0] + q_in[1]*q_in[1] + q_in[2]*q_in[2] + q_in[3]*q_in[3]);
+  iqn = 1/matrix_modulus(q_in,4);
 
   // normalize and negate if q0<0
-  for (size_t i=0; i<=3; i++) {
+  for (int i=0; i<=3; i++) {
     q_in[i] = q_in[i] * iqn;
-    if (q_in[0] < 0)
-      q_in[i] = -q_in[i];
+    if (q_in[0] < cz)
+      q[i] = -q_in[i];
+    else{
+       q[i] = q_in[i];
+    }
   }
 
-  q[0] = q_in[0];
-  q[1] = q_in[1];
-  q[2] = q_in[2];
-  q[3] = q_in[3];
 }
 
+template <typename T>
+static void __quat2euler(T *e,const T *q){
+  T Cnb31, Cnb32, Cnb33, Cnb21, Cnb11;
+  T q1,q2,q3,q4;
+  const T c2 = 2.0;
+  const T cz = 0.0;
+  const T c2pi = 6.283185307179586;
+  T eu_int[3];
+  q1 = q[0];
+  q2 = q[1];
+  q3 = q[2];
+  q4 = q[3];
+  Cnb11 = q1*q1+q2*q2-q3*q3-q4*q4;
+  Cnb21 = c2*(q2*q3+q1*q4);
+  Cnb31 = c2*(q2*q4-q1*q3);
+  Cnb32 = c2*(q3*q4+q1*q2);
+  Cnb33 = q1*q1-q2*q2-q3*q3+q4*q4;
+
+  eu_int[0] = atan2(Cnb32, Cnb33);   //roll крен
+  eu_int[1] = atan2(-Cnb31, sqrt(Cnb32*Cnb32+Cnb33*Cnb33));   //theta тангаж
+  eu_int[2] = atan2(Cnb21,Cnb11);          //psi курс
+  if (eu_int[2] < cz)
+  {
+    eu_int[2] = eu_int[2]+ c2pi;
+  };
+  e[0] = eu_int[0];
+  e[1] = eu_int[1];
+  e[2] = eu_int[2];
+}
 /**
  *
  */
 template <typename T>
-void mEuler2Quat(Quaternion<T> *q, const Vector3d<T> *eu){
+void Euler2Quat(Quaternion<T> *q, const Vector3d<T> *eu){
   T *eu_int,*q_int;
   eu_int = eu->getArray();
   q_int = q->getArray();
   __euler2quat<T>(q_int,eu_int);
+}
+
+template <typename T>
+void Quat2Euler(Vector3d<T> *eu,const Quaternion<T> *q){
+  T *eu_int,*q_int;
+  eu_int = eu->getArray();
+  q_int = q->getArray();
+  __quat2euler<T>(eu_int,q_int);
 }
 
 /**
