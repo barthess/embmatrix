@@ -12,9 +12,11 @@
   #define matrixDbgCheck(c, msg) {              \
     if (!(c)){                                  \
       std::cout << msg;                         \
+      throw 0;                                  \
       exit(1);                                  \
     }                                           \
   }
+  #define matrixDbgPrint(msg) { std::cout << msg; }
 #endif
 
 #endif /* MATRIX_DBG_HPP_ */
