@@ -7,3 +7,4 @@ vector.hpp
 quaternion.hpp
 vector3d.hpp
 testsuite.cpp
+rvo.cpp
