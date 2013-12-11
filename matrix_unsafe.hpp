@@ -2,7 +2,6 @@
 #define MATRIX_UNSAFE_H
 
 #include <stdint.h>
-#include <cstddef>
 #include "platform.h"
 #include "matrix_primitives.hpp"
 namespace matrix {
