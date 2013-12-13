@@ -8,10 +8,10 @@
 template<typename T, int r, int c>
 class Matrix2 {
 
-protected:
+public:
   T m[r*c];
-  size_t row = r;
-  size_t col = c;
+//  size_t row = r;
+//  size_t col = c;
 
 public:
   /**
@@ -58,7 +58,6 @@ public:
       return *this;
 
     /* */
-    matrixDbgCheck((src.col == this->col) && (src.row == this->row), "sizes mismatch");
     memcpy(this->m, src.m, sizeof(m));
     return *this;
   }
@@ -122,13 +121,13 @@ public:
    *
    */
   void print(void){
-    matrixDbgPrint(col);
+    matrixDbgPrint(c);
     matrixDbgPrint("x");
-    matrixDbgPrint(row);
+    matrixDbgPrint(r);
     matrixDbgPrint(":\n");
-    for (size_t i=0; i<row; i++){
-      for (size_t j=0; j<col; j++){
-        matrixDbgPrint(m[i*row + j]);
+    for (size_t i=0; i<r; i++){
+      for (size_t j=0; j<c; j++){
+        matrixDbgPrint(m[i*r + j]);
         matrixDbgPrint(" ");
       }
       matrixDbgPrint("\n");
@@ -137,20 +136,34 @@ public:
 };
 
 
-//template <typename T, int m, int n, int p>
-//Matrix2<T, r, c> operator * (Matrix2<T, r, c> &left, Matrix2<T, r, c> &right) {
-//  Matrix2<T, r, c> ret;
-//  ret = left + right;
-//  return ret;
-//}
-
-template <typename T, int r, int c, int rnew>
-Matrix2<T, rnew, c> submatrix(Matrix2<T, r, c> &left) {
-  Matrix2<T, rnew, c> ret;
-  ret.m = left.m + r;
+template <typename T, int m, int n, int p>
+Matrix2<T, m, p> operator * (const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right) {
+  matrixDbgPrint("Matrix * operator\n");
+  Matrix2<T, m, p> ret;
+  ret.m[0] = left.m[0] * right.m[0];
   return ret;
 }
 
+//template <typename T, int r, int c, int rnew>
+//Matrix2<T, rnew, c> submatrix(Matrix2<T, r, c> &left) {
+//  Matrix2<T, rnew, c> ret;
+//  ret.m = left.m + r;
+//  return ret;
+//}
+
 #endif // MATRIX2_H
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
