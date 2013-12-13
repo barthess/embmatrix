@@ -144,6 +144,36 @@ static void __euler2quat(T *q, const T *eu){
 
 }
 
+
+template <typename T>
+static void __euler2dcm(T *Cnb,const T *eu){
+  T phi, theta, psi;
+  T cph, sph;
+  T cth, sth;
+  T cp, sp;
+
+  phi = eu[1];     // roll
+  theta = eu[2];   // pitch
+  psi = eu[3];     // yaw
+
+  cph = cos(phi);
+  sph = sin(phi);
+  cth = cos(theta);
+  sth = sin(theta);
+  cp = cos(psi);
+  sp = sin(psi);
+  Cnb[0] = cp*cth;
+  Cnb[1] = cp*sph*sth - cph*sp;
+  Cnb[2] = sph*sp + cph*cp*sth;
+  Cnb[3] = cth*sp;
+  Cnb[4] = cph*cp + sph*sp*sth;
+  Cnb[5] = cph*sp*sth - cp*sph;
+  Cnb[6] = -sth;
+  Cnb[7] = cth*sph;
+  Cnb[8] = cph*cth;
+}
+
+
 template <typename T>
 static void __quat2euler(T *e,const T *q){
   T Cnb31, Cnb32, Cnb33, Cnb21, Cnb11;
@@ -192,6 +222,14 @@ void Quat2Euler(Vector3d<T> *eu,const Quaternion<T> *q){
   __quat2euler<T>(eu_int,q_int);
 }
 
+template <typename T>
+void Euler2DCM(MatrixUnsafe<T> *Cnb, const Vector3d<T> *eu){
+  T *eu_int,*Cnb_int;
+  eu_int = eu->getArray();
+  Cnb_int = Cnb->getArray();
+  __euler2dcm<T>(Cnb_int,eu_int);
+}
+
 /**
  *
  */
@@ -200,6 +238,24 @@ Quaternion<T> Qcon(const Quaternion<T> *q){
   Quaternion<T> res;
   q->ccon(&res);
   return res;
+}
+
+/**
+ * Quaternionian vector rotation
+ */
+template <typename T>
+void QuatRot(Vector3d<T> *v_rot, const Quaternion<T> *q, const Vector3d<T> *v_in){
+  Quaternion<T> qV,qVr,qc,tmp;
+  qV(0) = static_cast<T>(0);
+  qV(1) = (*v_in)(0);
+  qV(2) = (*v_in)(1);
+  qV(3) = (*v_in)(2);
+  qc = Qcon(q);
+  tmp = Qmul(q,&qV);
+  qVr = Qmul(&tmp,&qc);
+  (*v_rot)(0) = qVr(1);
+  (*v_rot)(1) = qVr(2);
+  (*v_rot)(2) = qVr(3);
 }
 
 } //namespace matrix
