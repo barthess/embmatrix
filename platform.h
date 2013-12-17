@@ -4,6 +4,7 @@
 #if defined(_CHIBIOS_RT_)
   #define matrixDbgCheck(a,b) chDbgCheck(a,b)
   #include "misc_math.hpp"
+  #define matrixDbgPrint(msg) {;}
 #else
   #include <iostream>
   #include <cstdlib>
