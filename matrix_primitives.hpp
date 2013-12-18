@@ -53,12 +53,16 @@ template <typename T>
 void matrix_multiply(uint32_t m, uint32_t p, uint32_t n,
                      const T *A, const T *B, T *C){
   uint32_t i, j, k;
+  T tmp;
   for(i=0; i<m; i++){     //each row in A
     for(j=0; j<n; j++){   //each column in B
-      C[i*n + j] = 0;
+      //C[i*n + j] = 0;
+      tmp = 0;
       for(k=0; k<p; k++){ //each element in row A & column B
-        C[i*n + j] += A[i*p + k] * B[k*n + j];
+        //C[i*n + j] += A[i*p + k] * B[k*n + j];
+        tmp += A[i*p + k] * B[k*n + j];
       }
+      C[i*n + j] = tmp;
     }
   }
 }

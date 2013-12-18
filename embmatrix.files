@@ -8,3 +8,5 @@ quaternion.hpp
 vector3d.hpp
 testsuite.cpp
 rvo.cpp
+matrix2.hpp
+matrix2.cpp
