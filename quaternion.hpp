@@ -182,8 +182,6 @@ template <typename T>
 static void __quat2euler(T *e,const T *q){
   T Cnb31, Cnb32, Cnb33, Cnb21, Cnb11;
   T q1, q2, q3, q4;
-  const T c2 = 2.0;
-  const T cz = 0.0;
   const T c2pi = 6.283185307179586;
   T eu_int[3];
 
@@ -192,17 +190,18 @@ static void __quat2euler(T *e,const T *q){
   q3 = q[2];
   q4 = q[3];
 
-  Cnb11 = q1*q1+q2*q2-q3*q3-q4*q4;
-  Cnb21 = c2*(q2*q3+q1*q4);
-  Cnb31 = c2*(q2*q4-q1*q3);
-  Cnb32 = c2*(q3*q4+q1*q2);
-  Cnb33 = q1*q1-q2*q2-q3*q3+q4*q4;
+  Cnb11 = q1*q1 + q2*q2 - q3*q3 - q4*q4;
+  Cnb21 = 2 * (q2*q3 + q1*q4);
+  Cnb31 = 2 * (q2*q4 - q1*q3);
+  Cnb32 = 2 * (q3*q4 + q1*q2);
+  Cnb33 = q1*q1 - q2*q2 - q3*q3 + q4*q4;
 
-  eu_int[0] = atan2(Cnb32, Cnb33);                              //roll крен
-  eu_int[1] = atan2(-Cnb31, sqrt(Cnb32*Cnb32 + Cnb33*Cnb33));   //theta тангаж
-  eu_int[2] = atan2(Cnb21, Cnb11);                              //psi курс
+  eu_int[0] = atan2(Cnb32,  Cnb33);                               //roll крен
+  eu_int[1] = atan2(-Cnb31, sqrt(Cnb32*Cnb32 + Cnb33*Cnb33));     //theta тангаж
+  eu_int[2] = atan2(Cnb21,  Cnb11);                               //psi курс
 
-  if (eu_int[2] < cz){
+  /* wrap 2pi */
+  if (eu_int[2] < 0){
     eu_int[2] = eu_int[2] + c2pi;
   }
 
