@@ -203,7 +203,7 @@ static void __quat2euler(T *e,const T *q){
   eu_int[2] = atan2(Cnb21, Cnb11);                              //psi курс
 
   if (eu_int[2] < cz){
-    eu_int[2] = eu_int[2]+ c2pi;
+    eu_int[2] = eu_int[2] + c2pi;
   }
 
   e[0] = eu_int[0];
