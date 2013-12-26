@@ -110,27 +110,30 @@ Quaternion<T> Qmul(const Quaternion<T> *left, const Quaternion<T> *right) {
  */
 template <typename T>
 static void __euler2quat(T *q, const T *eu){
+
   T phi05, theta05, psi05;
   T q_in[4];
   T cph05, sph05, cth05, sth05, cp05, sp05;
   T iqn;
   const T cz = 0.0;
   const T c2 = 2.0;
-  phi05   = eu[0]/c2;
-  theta05 = eu[1]/c2;
-  psi05   = eu[2]/c2;
+
+  phi05   = eu[0] / c2;
+  theta05 = eu[1] / c2;
+  psi05   = eu[2] / c2;
   cph05   = cos(phi05);
   sph05   = sin(phi05);
   cth05   = cos(theta05);
   sth05   = sin(theta05);
   cp05    = cos(psi05);
   sp05    = sin(psi05);
+
   q_in[0] = cph05*cth05*cp05 + sph05*sth05*sp05;
   q_in[1] = sph05*cth05*cp05 - cph05*sth05*sp05;
   q_in[2] = cph05*sth05*cp05 + sph05*cth05*sp05;
   q_in[3] = cph05*cth05*sp05 - sph05*sth05*cp05;
 
-  iqn = 1/matrix_modulus(q_in,4);
+  iqn = 1 / matrix_modulus(q_in, 4);
 
   // normalize and negate if q0<0
   for (int i=0; i<=3; i++) {
@@ -138,7 +141,7 @@ static void __euler2quat(T *q, const T *eu){
     if (q_in[0] < cz)
       q[i] = -q_in[i];
     else{
-       q[i] = q_in[i];
+      q[i] = q_in[i];
     }
   }
 
@@ -150,18 +153,19 @@ static void __euler2dcm(T *Cnb,const T *eu){
   T phi, theta, psi;
   T cph, sph;
   T cth, sth;
-  T cp, sp;
+  T cp,  sp;
 
-  phi = eu[1];     // roll
+  phi   = eu[1];   // roll
   theta = eu[2];   // pitch
-  psi = eu[3];     // yaw
+  psi   = eu[3];   // yaw
 
   cph = cos(phi);
   sph = sin(phi);
   cth = cos(theta);
   sth = sin(theta);
-  cp = cos(psi);
-  sp = sin(psi);
+  cp  = cos(psi);
+  sp  = sin(psi);
+
   Cnb[0] = cp*cth;
   Cnb[1] = cp*sph*sth - cph*sp;
   Cnb[2] = sph*sp + cph*cp*sth;
@@ -177,28 +181,31 @@ static void __euler2dcm(T *Cnb,const T *eu){
 template <typename T>
 static void __quat2euler(T *e,const T *q){
   T Cnb31, Cnb32, Cnb33, Cnb21, Cnb11;
-  T q1,q2,q3,q4;
+  T q1, q2, q3, q4;
   const T c2 = 2.0;
   const T cz = 0.0;
   const T c2pi = 6.283185307179586;
   T eu_int[3];
+
   q1 = q[0];
   q2 = q[1];
   q3 = q[2];
   q4 = q[3];
+
   Cnb11 = q1*q1+q2*q2-q3*q3-q4*q4;
   Cnb21 = c2*(q2*q3+q1*q4);
   Cnb31 = c2*(q2*q4-q1*q3);
   Cnb32 = c2*(q3*q4+q1*q2);
   Cnb33 = q1*q1-q2*q2-q3*q3+q4*q4;
 
-  eu_int[0] = atan2(Cnb32, Cnb33);   //roll крен
-  eu_int[1] = atan2(-Cnb31, sqrt(Cnb32*Cnb32+Cnb33*Cnb33));   //theta тангаж
-  eu_int[2] = atan2(Cnb21,Cnb11);          //psi курс
-  if (eu_int[2] < cz)
-  {
+  eu_int[0] = atan2(Cnb32, Cnb33);                              //roll крен
+  eu_int[1] = atan2(-Cnb31, sqrt(Cnb32*Cnb32 + Cnb33*Cnb33));   //theta тангаж
+  eu_int[2] = atan2(Cnb21, Cnb11);                              //psi курс
+
+  if (eu_int[2] < cz){
     eu_int[2] = eu_int[2]+ c2pi;
-  };
+  }
+
   e[0] = eu_int[0];
   e[1] = eu_int[1];
   e[2] = eu_int[2];
@@ -208,26 +215,26 @@ static void __quat2euler(T *e,const T *q){
  */
 template <typename T>
 void Euler2Quat(Quaternion<T> *q, const Vector3d<T> *eu){
-  T *eu_int,*q_int;
+  T *eu_int, *q_int;
   eu_int = eu->getArray();
   q_int = q->getArray();
-  __euler2quat<T>(q_int,eu_int);
+  __euler2quat<T>(q_int, eu_int);
 }
 
 template <typename T>
 void Quat2Euler(Vector3d<T> *eu,const Quaternion<T> *q){
-  T *eu_int,*q_int;
+  T *eu_int, *q_int;
   eu_int = eu->getArray();
   q_int = q->getArray();
-  __quat2euler<T>(eu_int,q_int);
+  __quat2euler<T>(eu_int, q_int);
 }
 
 template <typename T>
 void Euler2DCM(MatrixUnsafe<T> *Cnb, const Vector3d<T> *eu){
-  T *eu_int,*Cnb_int;
+  T *eu_int, *Cnb_int;
   eu_int = eu->getArray();
   Cnb_int = Cnb->getArray();
-  __euler2dcm<T>(Cnb_int,eu_int);
+  __euler2dcm<T>(Cnb_int, eu_int);
 }
 
 /**
@@ -245,14 +252,17 @@ Quaternion<T> Qcon(const Quaternion<T> *q){
  */
 template <typename T>
 void QuatRot(Vector3d<T> *v_rot, const Quaternion<T> *q, const Vector3d<T> *v_in){
-  Quaternion<T> qV,qVr,qc,tmp;
+  Quaternion<T> qV, qVr, qc, tmp;
+
   qV(0) = static_cast<T>(0);
   qV(1) = (*v_in)(0);
   qV(2) = (*v_in)(1);
   qV(3) = (*v_in)(2);
-  qc = Qcon(q);
-  tmp = Qmul(q,&qV);
-  qVr = Qmul(&tmp,&qc);
+
+  qc  = Qcon(q);
+  tmp = Qmul(q, &qV);
+  qVr = Qmul(&tmp, &qc);
+
   (*v_rot)(0) = qVr(1);
   (*v_rot)(1) = qVr(2);
   (*v_rot)(2) = qVr(3);
