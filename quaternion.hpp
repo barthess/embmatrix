@@ -115,12 +115,10 @@ static void __euler2quat(T *q, const T *eu){
   T q_in[4];
   T cph05, sph05, cth05, sth05, cp05, sp05;
   T iqn;
-  const T cz = 0.0;
-  const T c2 = 2.0;
 
-  phi05   = eu[0] / c2;
-  theta05 = eu[1] / c2;
-  psi05   = eu[2] / c2;
+  phi05   = eu[0] / 2;
+  theta05 = eu[1] / 2;
+  psi05   = eu[2] / 2;
   cph05   = cos(phi05);
   sph05   = sin(phi05);
   cth05   = cos(theta05);
@@ -138,7 +136,7 @@ static void __euler2quat(T *q, const T *eu){
   // normalize and negate if q0<0
   for (int i=0; i<=3; i++) {
     q_in[i] = q_in[i] * iqn;
-    if (q_in[0] < cz)
+    if (q_in[0] < 0)
       q[i] = -q_in[i];
     else{
       q[i] = q_in[i];
