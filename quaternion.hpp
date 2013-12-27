@@ -142,7 +142,6 @@ static void __euler2quat(T *q, const T *eu){
       q[i] = q_in[i];
     }
   }
-
 }
 
 
