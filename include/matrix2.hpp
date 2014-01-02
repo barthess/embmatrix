@@ -98,19 +98,6 @@ public:
   }
 
   /**
-   * @brief operator !
-   * @return inverse matrix
-   */
-  //X = !M
-  Matrix2 operator !(void){
-    Matrix2<T, r, c> ret(*this);
-    int res;
-    res = matrix_inverse(r,ret.M);
-    matrixDbgCheck(res == 1, "Inverse failure");//Insert analizer here
-    return ret;
-  }
-
-  /**
    * @note    here is no need to check sizes at run time
    */
   void operator += (const Matrix2 &S){
@@ -177,28 +164,12 @@ private:
   }
 };
 
-
 /**
- * Transpose matrix
+ *
  */
-template <typename T, int r, int c>
-Matrix2<T, c, r> operator~ (const Matrix2<T, r, c> &right){
-  Matrix2<T, c, r> ret;
-  matrix_transpose(r, c, right.M, ret.M);
-  return ret;
-}
-
-
 template <typename T, int m, int n, int p>
-Matrix2<T, m, p> operator * (const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right) {
-  //matrixDbgPrint("Matrix * operator\n");
-  Matrix2<T, m, p> ret;
-  matrix_multiply<T>(m, n, p, left.M, right.M, ret.M);
-  return ret;
-}
-
-template <typename T, int m, int n, int p>
-void mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right, Matrix2<T, m, p> &result) {
+void mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right,
+                                             Matrix2<T, m, p> &result) {
   matrix_multiply(m, n, p, left.M, right.M, result.M);
 }
 
