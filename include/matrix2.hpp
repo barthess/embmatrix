@@ -89,7 +89,7 @@ public:
   }
 
   /**
-   * Invers matrix itself
+   * Inverse matrix itself
    * The function returns 1 on success, 0 on failure.
    */
   int inverse(void) {
