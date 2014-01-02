@@ -35,6 +35,15 @@ public:
   /**
    *
    */
+  template<int n>
+  Matrix2(const Matrix2<T, r, n> &left, const Matrix2<T, n, c> &right){
+    matrixDbgPrint("Matrix multiply constructor\n");
+    matrix_multiply<T>(r, n, c, left.M, right.M, this->M);
+  }
+
+  /**
+   *
+   */
   Matrix2(T pattern) {
     matrixDbgPrint("Matrix pattern constructor\n");
     for (size_t i=0; i<(c*r); i++)
@@ -230,7 +239,11 @@ Matrix2<T, m, p> operator * (const Matrix2<T, m, n> &left, const Matrix2<T, n, p
   return ret;
 }
 
-
+template <typename T, int m, int n, int p>
+Matrix2<T, m, p> nrvo_mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right) {
+  Matrix2<T, m, p> ret(left, right);
+  return ret;
+}
 
 //template <typename T, int r, int c, int rnew>
 //Matrix2<T, rnew, c> submatrix(Matrix2<T, r, c> &left) {
