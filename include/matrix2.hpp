@@ -173,6 +173,15 @@ void mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right,
   matrix_multiply(m, n, p, left.M, right.M, result.M);
 }
 
+/**
+ *
+ */
+template <typename T, int m, int n, int p>
+Matrix2<T, m, p> operator * (const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right) {
+  Matrix2<T, m, p> result;
+  matrix_multiply(m, n, p, left.M, right.M, result.M);
+  return result;
+}
 
 }// matrix namespace
 
