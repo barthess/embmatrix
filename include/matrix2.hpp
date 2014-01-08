@@ -170,8 +170,17 @@ private:
 template <typename T, int m, int n, int p>
 void mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right,
                                              Matrix2<T, m, p> &result) {
-  matrixDbgCheck((&right != &result), "Multiplication can not work inplace");
+  matrixDbgCheck((&right != &result), "This function can not work inplace");
   matrix_multiply(m, n, p, left.M, right.M, result.M);
+}
+
+/**
+ *
+ */
+template <typename T, int m, int n>
+void transpose(const Matrix2<T, m, n> &left, Matrix2<T, n, m> &result) {
+  matrixDbgCheck((&left != &result), "This function can not work inplace");
+  matrix_transpose(m, n, left.M, result.M);
 }
 
 /**
