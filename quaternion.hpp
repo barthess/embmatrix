@@ -134,7 +134,7 @@ static void __euler2quat(T *q, const T *eu){
   iqn = 1 / matrix_modulus(q_in, 4);
 
   // normalize and negate if q0<0
-  for (int i=0; i<=3; i++) {
+  for (size_t i=0; i<=3; i++) {
     q_in[i] = q_in[i] * iqn;
     if (q_in[0] < 0)
       q[i] = -q_in[i];
@@ -144,7 +144,6 @@ static void __euler2quat(T *q, const T *eu){
   }
 }
 
-
 template <typename T>
 static void __euler2dcm(T *Cnb,const T *eu){
   T phi, theta, psi;
@@ -152,9 +151,9 @@ static void __euler2dcm(T *Cnb,const T *eu){
   T cth, sth;
   T cp,  sp;
 
-  phi   = eu[1];   // roll
-  theta = eu[2];   // pitch
-  psi   = eu[3];   // yaw
+  phi   = eu[0];   // roll
+  theta = eu[1];   // pitch
+  psi   = eu[2];   // yaw
 
   cph = cos(phi);
   sph = sin(phi);
@@ -172,6 +171,28 @@ static void __euler2dcm(T *Cnb,const T *eu){
   Cnb[6] = -sth;
   Cnb[7] = cth*sph;
   Cnb[8] = cph*cth;
+}
+
+template <typename T>
+static void __dcm2euler(T *eu,const T *Cnb){
+  T Cnb11, Cnb21, Cnb31, Cnb32, Cnb33;
+  T psi, theta, psi;
+  Cnb11 = Cnb[0];
+  Cnb21 = Cnb[3];
+  Cnb31 = Cnb[6];
+  Cnb32 = Cnb[7];
+  Cnb33 = Cnb[8];
+
+  phi   = atan2( Cnb32, Cnb33);                         // roll
+  theta = atan2(-Cnb31, sqrt(Cnb32*Cnb32+Cnb33*Cnb33)); // pitch
+  psi   = atan2( Cnb21, Cnb11);                         // yaw
+
+  if (psi < 0)
+    psi = psi+2*pi;
+
+  eu[0] = phi;
+  eu[1] = theta;
+  eu[2] = psi;
 }
 
 
