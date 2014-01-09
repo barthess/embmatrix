@@ -18,9 +18,9 @@ namespace matrix {
  * @brief   Matrix modulus.
  */
 template <typename T>
-T matrix_modulus(const T *A, uint32_t len){
+T matrix_modulus(const T *A, size_t len){
   T R = 0;
-  for (uint32_t i=0; i<len; i++)
+  for (size_t i=0; i<len; i++)
     R += A[i] * A[i];
   return sqrt(R);
 }
@@ -29,9 +29,9 @@ T matrix_modulus(const T *A, uint32_t len){
  * @brief   Normalize matrix inplace.
  */
 template <typename T>
-void matrix_normalize(T *A, uint32_t len){
+void matrix_normalize(T *A, size_t len){
   T R = matrix_modulus(A, len);
-  for (uint32_t i=0; i<len; i++)
+  for (size_t i=0; i<len; i++)
     A[i] /= R;
 }
 
@@ -39,8 +39,8 @@ void matrix_normalize(T *A, uint32_t len){
  * @brief     transpose matrix A(m x n) to B(n x m)
  */
 template <typename T>
-void matrix_transpose(uint32_t m, uint32_t n, const T *A, T *B){
-  uint32_t i, j;
+void matrix_transpose(size_t m, size_t n, const T *A, T *B){
+  size_t i, j;
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
       B[j*m + i] = A[i*n + j];
@@ -50,16 +50,15 @@ void matrix_transpose(uint32_t m, uint32_t n, const T *A, T *B){
  * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
  */
 template <typename T>
-void matrix_multiply(uint32_t m, uint32_t p, uint32_t n,
+void matrix_multiply(size_t m, size_t p, size_t n,
                      const T *A, const T *B, T *C){
-  uint32_t i, j, k;
+  size_t i, j, k;
   T tmp;
+
   for(i=0; i<m; i++){     //each row in A
     for(j=0; j<n; j++){   //each column in B
-      //C[i*n + j] = 0;
       tmp = 0;
       for(k=0; k<p; k++){ //each element in row A & column B
-        //C[i*n + j] += A[i*p + k] * B[k*n + j];
         tmp += A[i*p + k] * B[k*n + j];
       }
       C[i*n + j] = tmp;
@@ -68,27 +67,10 @@ void matrix_multiply(uint32_t m, uint32_t p, uint32_t n,
 }
 
 /**
- * @brief   Same as previouse but A is matrix of pointers to values
- */
-template <typename T>
-void matrix_multiply(uint32_t m,  uint32_t p, uint32_t n,
-                     const T **A, const T *B, T *C){
-  uint32_t i, j, k;
-  for(i=0; i<m; i++){     //each row in A
-    for(j=0; j<n; j++){   //each column in B
-      C[i*n + j] = 0;
-      for(k=0; k<p; k++){ //each element in row A & column B
-        C[i*n + j] += *A[i*p + k] * B[k*n + j];
-      }
-    }
-  }
-}
-
-/**
  * @brief   Copy function
  */
 template <typename T>
-void matrix_copy(uint32_t m, uint32_t n, const T *A, T *B){
+void matrix_copy(size_t m, size_t n, const T *A, T *B){
   memcpy(B, A, (m * n * sizeof(A[0])));
 }
 
@@ -99,13 +81,15 @@ void matrix_copy(uint32_t m, uint32_t n, const T *A, T *B){
 //   NUMERICAL RECIPES: The Art of Scientific Computing.
 // * The function returns 1 on success, 0 on failure.
 // * NOTE: The argument is ALSO the result matrix, meaning the input matrix is REPLACED
+
+// A = input matrix AND result matrix
+// n = number of rows = number of columns in A (n x n)
 template <typename T>
-int32_t matrix_inverse(int32_t n, T *A){
-  // A = input matrix AND result matrix
-  // n = number of rows = number of columns in A (n x n)
-  int32_t pivrow = 0; // keeps track of current pivot row
-  int32_t k,i,j;      // k: overall index along diagonal; i: row index; j: col index
-  int32_t pivrows[n]; // keeps track of rows swaps to undo at end
+int matrix_inverse(int n, T *A){
+
+  int pivrow = 0; // keeps track of current pivot row
+  int k,i,j;      // k: overall index along diagonal; i: row index; j: col index
+  int pivrows[n]; // keeps track of rows swaps to undo at end
   T tmp;    // used for finding max value and making column swaps
 
   for (k=0; k<n; k++){
@@ -132,8 +116,8 @@ int32_t matrix_inverse(int32_t n, T *A){
     }
     pivrows[k] = pivrow;  // record row swap (even if no swap happened)
 
-    tmp = static_cast<T>(1) / A[k*n + k];  // invert pivot element
-    A[k*n + k] = static_cast<T>(1);    // This element of input matrix becomes result matrix
+    tmp = 1 / A[k*n + k];  // invert pivot element
+    A[k*n + k] = 1;    // This element of input matrix becomes result matrix
 
     // Perform row reduction (divide every element by pivot)
     for (j=0; j<n; j++)

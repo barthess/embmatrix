@@ -12,8 +12,6 @@ class Matrix2 {
 
 public:
   T M[r*c];
-//  size_t row = r;
-//  size_t col = c;
 
 public:
   /**
@@ -90,60 +88,14 @@ public:
     return ret;
   }
 
-//  /**
-//   * @brief   Multiply matrix themself by another matrix
-//   * @param[in] right     multiplier
-//   * @param[out] result   place result in it
-//   */
-//  void mul(const Matrix2 &right, Matrix2 &result){
-
-//    matrixDbgCheck(((this->col == right.row) &&
-//                (result.row == this->row) &&
-//                (result.col == right.col)), "sizes inconsistent");
-
-//    matrix_multiply(this->row, this->col, right.col,
-//                    this->m, right.m, result.m);
-//  }
-
-
-
-//  /**
-//   * @brief   Multiply operator
-//   * @param[in] right     multiplier
-//   */
-//  Matrix2 operator * (const Matrix2 &right) {
-//    Matrix2<T, this->row, right.col> ret;
-//    this->mul(right, ret);
-//    return ret;
-//  }
-
   /**
-   * Invers matrix itself
+   * Inverse matrix itself
    * The function returns 1 on success, 0 on failure.
    */
-  int32_t inverse(void){
-    matrixDbgCheck(this->col == this->row, "matrix must be square");
-    return matrix_inverse(static_cast<int32_t>(this->col), this->m);
+  int inverse(void) {
+    matrixDbgCheck(c == r, "matrix must be square");
+    return matrix_inverse(c, M);
   }
-
-  /**
-   * @brief operator !
-   * @return inverse matrix
-   */
-  //X = !M
-  Matrix2 operator !(void){
-    Matrix2<T, r, c> ret(*this);
-    int res;
-    res = matrix_inverse(r,ret.M);
-    matrixDbgCheck(res == 1, "Inverse failure");//Insert analizer here
-    return ret;
-  }
-//  template <typename T, int r, int c>
-//  Matrix2<T, c, r> operator~ (const Matrix2<T, r, c> &right){
-//    Matrix2<T, c, r> ret;
-//    matrix_transpose(r, c, right.M, ret.M);
-//    return ret;
-//  }
 
   /**
    * @note    here is no need to check sizes at run time
@@ -155,12 +107,16 @@ public:
     }
   }
 
+  /**
+   * @note    here is no need to check sizes at run time
+   */
   void operator -= (const Matrix2 &S){
     matrixDbgPrint("Matrix += operator\n");
     for (size_t i=0; i<(r*c); i++){
       M[i] -= S.M[i];
     }
   }
+
   /**
    * @brief Subindex for Matrix elements assignation.
    * @param r
@@ -206,53 +162,37 @@ private:
     matrixDbgCheck((c > col) && (r > row), "overflow");
     return row*c + col;
   }
-
-
 };
 
+/**
+ *
+ */
+template <typename T, int m, int n, int p>
+void mul(const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right,
+                                             Matrix2<T, m, p> &result) {
+  matrixDbgCheck((&right != &result), "This function can not work inplace");
+  matrix_multiply(m, n, p, left.M, right.M, result.M);
+}
 
 /**
- * Transpose matrix
+ *
  */
-template <typename T, int r, int c>
-Matrix2<T, c, r> operator~ (const Matrix2<T, r, c> &right){
-  Matrix2<T, c, r> ret;
-  matrix_transpose(r, c, right.M, ret.M);
-  return ret;
+template <typename T, int m, int n>
+void transpose(const Matrix2<T, m, n> &left, Matrix2<T, n, m> &result) {
+  matrixDbgCheck((&left != &result), "This function can not work inplace");
+  matrix_transpose(m, n, left.M, result.M);
 }
 
-
+/**
+ *
+ */
 template <typename T, int m, int n, int p>
 Matrix2<T, m, p> operator * (const Matrix2<T, m, n> &left, const Matrix2<T, n, p> &right) {
-  matrixDbgPrint("Matrix * operator\n");
-  Matrix2<T, m, p> ret;
-  matrix_multiply<T>(m, n, p, left.M, right.M, ret.M);
-  return ret;
+  Matrix2<T, m, p> result;
+  matrix_multiply(m, n, p, left.M, right.M, result.M);
+  return result;
 }
 
-
-
-//template <typename T, int r, int c, int rnew>
-//Matrix2<T, rnew, c> submatrix(Matrix2<T, r, c> &left) {
-//  Matrix2<T, rnew, c> ret;
-//  ret.m = left.m + r;
-//  return ret;
-//}
+}// matrix namespace
 
 #endif // MATRIX2_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}// matrix namespace

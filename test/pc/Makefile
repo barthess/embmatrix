@@ -1,3 +1,4 @@
+INC = ../../include
 CC = g++
 CPPWARN = -Wall \
 		  -Wextra \
@@ -10,13 +11,13 @@ CPPWARN = -Wall \
 		  -Wnon-virtual-dtor 
 
 CFLAGS = -O0 -ggdb
-CPPFLAGS = $(CFLAGS) $(CPPWARN)
+CPPFLAGS = $(CFLAGS) $(CPPWARN) -I$(INC)
 
-DEPS = *.hpp *.h 
+DEPS = $(INCDIR)*.hpp $(INCDIR)*.h 
 
 all: testsuite
 
-testsuite: $(DEPS)
+testsuite: $(INCDIR)
 
 .PHONY: clean, test
 
