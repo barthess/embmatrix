@@ -197,6 +197,80 @@ static void __dcm2euler(T *eu,const T *Cnb){
   eu[2] = psi;
 }
 
+template <typename T>
+static void __dcm2quat(T *q, const T *Cnb){
+  T Cnb11, Cnb12, Cnb13;
+  T Cnb21, Cnb22, Cnb23;
+  T Cnb31, Cnb32, Cnb33;
+  T qnb[4];
+  T trC;
+  T P[4];
+  T iqn;
+
+  size_t mP;
+
+  Cnb11 = Cnb[0]; Cnb12 = Cnb[1]; Cnb13 = Cnb[2];
+  Cnb21 = Cnb[3]; Cnb22 = Cnb[4]; Cnb23 = Cnb[5];
+  Cnb31 = Cnb[6]; Cnb32 = Cnb[7]; Cnb33 = Cnb[8];
+
+  trC = Cnb11 + Cnb22 + Cnb33;
+
+  P[0] = 1+trC;
+  P[1] = 1+2*Cnb11-trC;
+  P[2] = 1+2*Cnb22-trC;
+  P[3] = 1+2*Cnb33-trC;
+
+  //mP = max([P1 P2 P3 P4]);
+  mP = 0;
+  for (size_t i = 1; i<4; i++){
+    if (mP<P[i])
+      mP = i;
+  }
+
+  switch (mP){
+    case 0:
+      qnb[0] = sqrt(P[0])/2;
+      qnb[1] = (Cnb32-Cnb23)/(4*qnb[0]);
+      qnb[2] = (Cnb13-Cnb31)/(4*qnb[0]);
+      qnb[3] = (Cnb21-Cnb12)/(4*qnb[0]);
+    break;
+    case 1:
+      qnb[1] = sqrt(P[1])/2;
+      qnb[2] = (Cnb21+Cnb12)/(4*qnb[1]);
+      qnb[3] = (Cnb13+Cnb31)/(4*qnb[1]);
+      qnb[0] = (Cnb32-Cnb23)/(4*qnb[1]);
+    break;
+    case 2:
+      qnb[2] = sqrt(P[2])/2;
+      qnb[3] = (Cnb32+Cnb23)/(4*qnb[2]);
+      qnb[0] = (Cnb13-Cnb31)/(4*qnb[2]);
+      qnb[1] = (Cnb21-Cnb12)/(4*qnb[2]);
+    break;
+    case 3:
+      qnb[3] = sqrt(P[3])/2;
+      qnb[0] = (Cnb21-Cnb12)/(4*qnb[3]);
+      qnb[1] = (Cnb13+Cnb31)/(4*qnb[3]);
+      qnb[2] = (Cnb32+Cnb23)/(4*qnb[3]);
+    break;
+    default:
+    break;
+  }
+
+  iqn = 1 / matrix_modulus(qnb, 4);
+
+   // normalize and negate if q0<0
+   for (size_t i=0; i<=3; i++) {
+     qnb[i] = qnb[i] * iqn;
+     if (qnb[0] < 0)
+       q[i] = -qnb[i];
+     else{
+       q[i] = qnb[i];
+     }
+   }
+}
+
+
+
 
 template <typename T>
 static void __quat2euler(T *e,const T *q){
@@ -264,6 +338,14 @@ void DCM2Euler(Vector3d<T> *eu, MatrixUnsafe<T> *Cnb){
   __dcm2euler<T>(eu_int, Cnb_int);
 }
 
+template <typename T>
+void DCM2Quat(Quaternion<T> *q, MatrixUnsafe<T> *Cnb){
+  T *q_int, *Cnb_int;
+  q_int = q->getArray();
+  Cnb_int = Cnb->getArray();
+  __dcm2quat<T>(q_int, Cnb_int);
+}
+
 /**
  *
  */
@@ -297,3 +379,5 @@ void QuatRot(Vector3d<T> *v_rot, const Quaternion<T> *q, const Vector3d<T> *v_in
 
 } //namespace matrix
 #endif /* QUATERNION_HPP_ */
+
+
