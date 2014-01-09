@@ -3,6 +3,7 @@
 
 #include "vector.hpp"
 #include "vector3d.hpp"
+#include "matrix2.hpp"
 namespace matrix {
 
 /**
@@ -176,7 +177,8 @@ static void __euler2dcm(T *Cnb,const T *eu){
 template <typename T>
 static void __dcm2euler(T *eu,const T *Cnb){
   T Cnb11, Cnb21, Cnb31, Cnb32, Cnb33;
-  T psi, theta, psi;
+  T phi, theta, psi;
+  const T c2pi = 6.283185307179586;
   Cnb11 = Cnb[0];
   Cnb21 = Cnb[3];
   Cnb31 = Cnb[6];
@@ -188,7 +190,7 @@ static void __dcm2euler(T *eu,const T *Cnb){
   psi   = atan2( Cnb21, Cnb11);                         // yaw
 
   if (psi < 0)
-    psi = psi+2*pi;
+    psi = psi+c2pi;
 
   eu[0] = phi;
   eu[1] = theta;
@@ -252,6 +254,14 @@ void Euler2DCM(MatrixUnsafe<T> *Cnb, const Vector3d<T> *eu){
   eu_int = eu->getArray();
   Cnb_int = Cnb->getArray();
   __euler2dcm<T>(Cnb_int, eu_int);
+}
+
+template <typename T>
+void DCM2Euler(Vector3d<T> *eu, MatrixUnsafe<T> *Cnb){
+  T *eu_int, *Cnb_int;
+  eu_int = eu->getArray();
+  Cnb_int = Cnb->getArray();
+  __dcm2euler<T>(eu_int, Cnb_int);
 }
 
 /**
