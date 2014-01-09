@@ -206,8 +206,8 @@ static void __dcm2quat(T *q, const T *Cnb){
   T trC;
   T P[4];
   T iqn;
-
-  size_t mP;
+  T mP;
+  size_t sw;
 
   Cnb11 = Cnb[0]; Cnb12 = Cnb[1]; Cnb13 = Cnb[2];
   Cnb21 = Cnb[3]; Cnb22 = Cnb[4]; Cnb23 = Cnb[5];
@@ -221,13 +221,16 @@ static void __dcm2quat(T *q, const T *Cnb){
   P[3] = 1+2*Cnb33-trC;
 
   //mP = max([P1 P2 P3 P4]);
-  mP = 0;
+  mP = P[0];
+  sw = 0;
   for (size_t i = 1; i<4; i++){
-    if (mP<P[i])
-      mP = i;
+    if (mP<P[i]){
+      mP = P[i];
+      sw = i;
+    }
   }
 
-  switch (mP){
+  switch (sw){
     case 0:
       qnb[0] = sqrt(P[0])/2;
       qnb[1] = (Cnb32-Cnb23)/(4*qnb[0]);
@@ -331,7 +334,7 @@ void Euler2DCM(MatrixUnsafe<T> *Cnb, const Vector3d<T> *eu){
 }
 
 template <typename T>
-void DCM2Euler(Vector3d<T> *eu, MatrixUnsafe<T> *Cnb){
+void DCM2Euler(Vector3d<T> *eu, const  MatrixUnsafe<T> *Cnb){
   T *eu_int, *Cnb_int;
   eu_int = eu->getArray();
   Cnb_int = Cnb->getArray();
@@ -339,7 +342,7 @@ void DCM2Euler(Vector3d<T> *eu, MatrixUnsafe<T> *Cnb){
 }
 
 template <typename T>
-void DCM2Quat(Quaternion<T> *q, MatrixUnsafe<T> *Cnb){
+void DCM2Quat(Quaternion<T> *q, const  MatrixUnsafe<T> *Cnb){
   T *q_int, *Cnb_int;
   q_int = q->getArray();
   Cnb_int = Cnb->getArray();
