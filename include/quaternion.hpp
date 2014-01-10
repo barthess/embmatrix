@@ -380,7 +380,21 @@ void QuatRot(Vector3d<T> *v_rot, const Quaternion<T> *q, const Vector3d<T> *v_in
   (*v_rot)(2) = qVr(3);
 }
 
+template <typename T>
+bool isCorrect(const Quaternion<T> &q){
+  if (
+      isinf(q(0)) || isnan(q(0)) ||
+      isinf(q(1)) || isnan(q(1)) ||
+      isinf(q(2)) || isnan(q(2)) ||
+      isinf(q(3)) || isnan(q(3))
+     )
+    return CH_FAILED;
+  else
+    return CH_SUCCESS;
+}
+
 } //namespace matrix
+
 #endif /* QUATERNION_HPP_ */
 
 
