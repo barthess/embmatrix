@@ -276,6 +276,35 @@ static void __dcm2quat(T *q, const T *Cnb){
 
 
 template <typename T>
+static void __quat2dcm(T *Cnb, const T *q){
+  T Cnb11, Cnb12, Cnb13;
+  T Cnb21, Cnb22, Cnb23;
+  T Cnb31, Cnb32, Cnb33;
+  T Q1, Q2, Q3, Q4;
+  T Q1_2, Q2_2, Q3_2, Q4_2;
+
+  Q1 = q[0]; Q2 = q[1]; Q3 = q[2]; Q4 = q[3];
+  Q1_2 = Q1*Q1;
+  Q2_2 = Q2*Q2;
+  Q3_2 = Q3*Q3;
+  Q4_2 = Q4*Q4;
+  Cnb11 = Q1_2+Q2_2-Q3_2-Q4_2;
+  Cnb22 = Q1_2-Q2_2+Q3_2-Q4_2;
+  Cnb33 = Q1_2-Q2_2-Q3_2+Q4_2;
+
+  Cnb12 = 2*(Q2*Q3-Q1*Q4);
+  Cnb13 = 2*(Q2*Q4+Q1*Q3);
+  Cnb21 = 2*(Q2*Q3+Q1*Q4);
+  Cnb23 = 2*(Q3*Q4-Q1*Q2);
+  Cnb31 = 2*(Q2*Q4-Q1*Q3);
+  Cnb32 = 2*(Q3*Q4+Q1*Q2);
+
+  Cnb[0] = Cnb11; Cnb[1] = Cnb12; Cnb[2] = Cnb13;
+  Cnb[3] = Cnb21; Cnb[4] = Cnb22; Cnb[5] = Cnb23;
+  Cnb[6] = Cnb31; Cnb[7] = Cnb32; Cnb[8] = Cnb33;
+}
+
+template <typename T>
 static void __quat2euler(T *e,const T *q){
   T Cnb31, Cnb32, Cnb33, Cnb21, Cnb11;
   T q1, q2, q3, q4;
@@ -306,6 +335,7 @@ static void __quat2euler(T *e,const T *q){
   e[1] = eu_int[1];
   e[2] = eu_int[2];
 }
+
 /**
  *
  */
@@ -347,6 +377,14 @@ void DCM2Quat(Quaternion<T> *q, const  MatrixUnsafe<T> *Cnb){
   q_int = q->getArray();
   Cnb_int = Cnb->getArray();
   __dcm2quat<T>(q_int, Cnb_int);
+}
+
+template <typename T>
+void Quat2DCM(MatrixUnsafe<T> *Cnb, const Quaternion<T> *q){
+  T *q_int, *Cnb_int;
+  q_int = q->getArray();
+  Cnb_int = Cnb->getArray();
+  __quat2dcm<T>(Cnb_int, q_int);
 }
 
 /**
