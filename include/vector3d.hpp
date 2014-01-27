@@ -49,6 +49,10 @@ public:
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
   }
 
+  void norm(void){
+    matrix_normalize(this->m, 3);
+  }
+
   /**
    * cross product in right handed 3-d space
    */
