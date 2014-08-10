@@ -30,7 +30,7 @@ endif
 
 # Enable this if you want to see the full log while compiling.
 ifeq ($(USE_VERBOSE_COMPILE),)
-  USE_VERBOSE_COMPILE = yes
+  USE_VERBOSE_COMPILE = no
 endif
 
 #
@@ -90,7 +90,8 @@ CSRC = $(PORTSRC) \
 # setting.
 CPPSRC = $(CHCPPSRC) \
          matrix_test.cpp \
-         main.cpp
+         main.cpp \
+         gcc_stubs.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler

@@ -145,6 +145,16 @@ static SequencerThread blinker2(LED4_sequence);
 static SequencerThread blinker3(LED5_sequence);
 static SequencerThread blinker4(LED6_sequence);
 
+
+
+#define rccEnableCCM(lp) rccEnableAHB1(RCC_AHB1ENR_CCMDATARAMEN, lp)
+#define rccDisableCCM(lp) rccDisableAHB1(RCC_AHB1ENR_CCMDATARAMEN, lp)
+
+MemoryHeap MatrixHeap;
+int matrix_alloc_cnt = 0;
+#define MATRIX_HEAP_SIZE    65536
+static void *matrix_heap_buf = (void *)0x10000000;
+
 /*
  * Application entry point.
  */
@@ -159,6 +169,10 @@ int main(void) {
    */
   halInit();
   System::init();
+
+
+  rccEnableCCM(false);
+  chHeapInit(&MatrixHeap, matrix_heap_buf, MATRIX_HEAP_SIZE);
 
   /*
    * Activates the serial driver 2 using the driver default configuration.
@@ -187,6 +201,7 @@ int main(void) {
     };
     BaseThread::sleep(MS2ST(500));
     matrix_test();
+    matrix3_test();
   }
 
   return 0;
