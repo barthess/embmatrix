@@ -50,7 +50,7 @@ void matrix_transpose(size_t m, size_t n, const T *A, T *B){
  * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
  */
 template <typename T>
-void matrix_multiply(size_t m, size_t p, size_t n,
+void matrix_multiply_slow(size_t m, size_t p, size_t n,
                      const T *A, const T *B, T *C){
   size_t i, j, k;
   T tmp;
@@ -62,6 +62,48 @@ void matrix_multiply(size_t m, size_t p, size_t n,
         tmp += A[i*p + k] * B[k*n + j];
       }
       C[i*n + j] = tmp;
+    }
+  }
+}
+
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ * @note    Faster variant developing for using MAC instructions from
+ *          cortex-m4f
+ */
+template <typename T>
+void matrix_multiply(size_t m, size_t p, size_t n,
+                     const T *A, const T *B, T *C){
+
+  const size_t Nround = p - (p % 4);
+
+  for(size_t i=0; i<m; i++){
+    for(size_t j=0; j<n; j++){
+      T s = 0;
+      for(size_t k=0; k<Nround; k+=4){
+        T a0, a1, a2, a3;
+        T b0, b1, b2, b3;
+
+        a0 = A[i*p + k];
+        a1 = A[i*p + k+1];
+        a2 = A[i*p + k+2];
+        a3 = A[i*p + k+3];
+
+        b0 = B[k*n + j];
+        b1 = B[(k+1)*n + j];
+        b2 = B[(k+2)*n + j];
+        b3 = B[(k+3)*n + j];
+
+        s += a0 * b0;
+        s += a1 * b1;
+        s += a2 * b2;
+        s += a3 * b3;
+      }
+      for (size_t k=Nround; k<p; k++){
+        s += A[i*p + k] * B[k*n + j];
+      }
+
+      C[i*n + j] = s;
     }
   }
 }

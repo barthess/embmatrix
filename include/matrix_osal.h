@@ -5,19 +5,33 @@
 #include "gcc_stubs.hpp"
 #include "misc_math.hpp"
 
-extern MemoryHeap MatrixHeap;
-extern int matrix_alloc_cnt;
+extern memory_heap_t MatrixHeap;
+extern size_t matrix_malloc_cnt, matrix_free_cnt;
+extern uint32_t matrix_alloc_time, matrix_free_time;
+extern memory_pool_t matrix_pool;
 
-#define matrixDbgCheck(a,b) chDbgCheck(a,b)
+#define matrixDbgCheck(a) osalDbgCheck(a)
 #define matrixDbgPrint(msg) {;}
 
 static inline void *matrix_malloc(size_t len) {
-  matrix_alloc_cnt++;
-  return chHeapAlloc(&MatrixHeap, len);
+  void *ret;
+  uint32_t start = chSysGetRealtimeCounterX();
+  matrix_malloc_cnt++;
+  //ret = chHeapAlloc(&MatrixHeap, len);
+  ret = chPoolAlloc(&matrix_pool);
+  osalDbgCheck(NULL != ret);
+  matrix_alloc_time += chSysGetRealtimeCounterX() - start;
+  return ret;
 }
+
 static inline void matrix_free(void *p) {
-  matrix_alloc_cnt--;
-  chHeapFree(p);
+  uint32_t start = chSysGetRealtimeCounterX();
+  if (NULL != p){
+    matrix_free_cnt++;
+    //chHeapFree(p);
+    chPoolFree(&matrix_pool, p);
+  }
+  matrix_free_time += chSysGetRealtimeCounterX() - start;
 }
 
 #else

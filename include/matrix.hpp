@@ -66,7 +66,7 @@ public:
    */
   Matrix(const T *array, size_t arraysize) {
     matrixDbgPrint("Matrix const array constructor\n");
-    matrixDbgCheck(msize() == arraysize, "sizes mismatch");
+    matrixDbgCheck(msize() == arraysize);
     _default_ctor();
     memcpy(this->M, array, arraysize);
   }
@@ -92,11 +92,11 @@ public:
    */
   Matrix& operator ! (void){
     matrixDbgPrint("Matrix inverse operator\n");
-    matrixDbgCheck(c == r, "matrix must be square");
+    matrixDbgCheck(c == r); /* matrix must be square */
 
     /* The function returns 1 on success, 0 on failure. */
     int inv_res = matrix_inverse(c, M);
-    matrixDbgCheck(1 == inv_res, "matrix inversion failed");
+    matrixDbgCheck(1 == inv_res); /* matrix inversion failed */
     return *this;
   }
 
@@ -109,6 +109,19 @@ public:
 
     for (size_t i=0; i<(r*c); i++){
       ret.M[i] = this->M[i] + S.M[i];
+    }
+    return ret;
+  }
+
+  /**
+   * @note    here is no need to check sizes at run time
+   */
+  Matrix operator - (const Matrix &S) const {
+    matrixDbgPrint("Matrix - operator\n");
+    Matrix<T, r, c> ret;
+
+    for (size_t i=0; i<(r*c); i++){
+      ret.M[i] = this->M[i] - S.M[i];
     }
     return ret;
   }
@@ -146,7 +159,7 @@ private:
    * @brief calculate subindex from row and col values
    */
   size_t calc_subindex(size_t row, size_t col) const {
-    matrixDbgCheck((c > col) && (r > row), "overflow");
+    matrixDbgCheck((c > col) && (r > row)); /* overflow */
     return row*c + col;
   }
 };
@@ -158,6 +171,13 @@ template <typename T, int m, int n, int p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left, const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
   matrix_multiply(m, n, p, left.M, right.M, ret.M);
+
+//  Matrix<T, m, p> test, ref;
+//  matrix_multiply_slow(m, n, p, left.M, right.M, test.M);
+//
+//  ref = ret - test;
+//  for (size_t i=0; i<m*p; i++)
+//    osalDbgCheck((ref.M[i] < 0.001) && (ref.M[i] > -0.001));
   return ret;
 }
 
