@@ -1,5 +1,5 @@
-#ifndef MATRIX_PLATFORM_HPP_
-#define MATRIX_PLATFORM_HPP_
+#ifndef MATRIX_OSAL_HPP_
+#define MATRIX_OSAL_HPP_
 
 #if defined(_CHIBIOS_RT_)
 #include "gcc_stubs.hpp"
@@ -35,4 +35,4 @@ static inline void matrix_free(void *p) {
   #define matrixDbgPrint(msg) { std::cout << msg; }
 #endif
 
-#endif /* MATRIX_PLATFORM_HPP_ */
+#endif /* MATRIX_OSAL_HPP_ */

@@ -10,6 +10,6 @@
 
 
 float* matrix_test(void);
-float* matrix3_test(void);
+
 
 #endif /* MATRIX_TEXT_HPP_ */

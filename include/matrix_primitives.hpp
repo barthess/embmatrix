@@ -69,10 +69,10 @@ void matrix_multiply(size_t m, size_t p, size_t n,
 /**
  * @brief   Copy function
  */
-template <typename T>
-void matrix_copy(size_t m, size_t n, const T *A, T *B){
-  memcpy(B, A, (m * n * sizeof(A[0])));
-}
+//template <typename T>
+//void matrix_copy(size_t m, size_t n, const T *A, T *B){
+//  memcpy(B, A, (m * n * sizeof(A[0])));
+//}
 
 // Matrix Inversion Routine from http://www.arduino.cc/playground/Code/MatrixMath
 // * This function inverts a matrix based on the Gauss Jordan method.

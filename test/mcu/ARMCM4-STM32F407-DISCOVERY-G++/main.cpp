@@ -201,7 +201,6 @@ int main(void) {
     };
     BaseThread::sleep(MS2ST(500));
     matrix_test();
-    matrix3_test();
   }
 
   return 0;
