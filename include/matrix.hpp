@@ -87,6 +87,18 @@ public:
     }
   }
 
+  /**
+   * @brief Inverse operator
+   */
+  Matrix& operator ! (void){
+    matrixDbgPrint("Matrix inverse operator\n");
+    matrixDbgCheck(c == r, "matrix must be square");
+
+    /* The function returns 1 on success, 0 on failure. */
+    int inv_res = matrix_inverse(c, M);
+    matrixDbgCheck(1 == inv_res, "matrix inversion failed");
+    return *this;
+  }
 
   /**
    * @note    here is no need to check sizes at run time
@@ -101,8 +113,25 @@ public:
     return ret;
   }
 
+  /**
+   * @brief Subindex for Matrix elements assignation.
+   * @param r
+   * @param c
+   * @return pointer to the element.
+   */
+  T& operator() (const size_t row, const size_t col){
+    return this->M[calc_subindex(row,col)];
+  }
 
-
+  /**
+   * @brief Subindex for Matrix element.
+   * @param r
+   * @param c
+   * @return the element.
+   */
+  T operator() (size_t row, size_t col) const{
+    return this->M[calc_subindex(row, col)];
+  }
 
 private:
   constexpr size_t msize(void){
@@ -112,15 +141,33 @@ private:
   void _default_ctor(void){
     this->M = static_cast<T *>(matrix_malloc(msize()));
   }
+
+  /**
+   * @brief calculate subindex from row and col values
+   */
+  size_t calc_subindex(size_t row, size_t col) const {
+    matrixDbgCheck((c > col) && (r > row), "overflow");
+    return row*c + col;
+  }
 };
 
 /**
- *
+ * Multiply operator
  */
 template <typename T, int m, int n, int p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left, const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
   matrix_multiply(m, n, p, left.M, right.M, ret.M);
+  return ret;
+}
+
+/**
+ * @brief Transpose operator
+ */
+template <typename T, int m, int n>
+Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
+  Matrix<T, n, m> ret;
+  matrix_transpose(m, n, left.M, ret.M);
   return ret;
 }
 
