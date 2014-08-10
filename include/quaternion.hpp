@@ -3,6 +3,7 @@
 
 #include "vector.hpp"
 #include "vector3d.hpp"
+#include "matrix2.hpp"
 namespace matrix {
 
 /**
@@ -134,7 +135,7 @@ static void __euler2quat(T *q, const T *eu){
   iqn = 1 / matrix_modulus(q_in, 4);
 
   // normalize and negate if q0<0
-  for (int i=0; i<=3; i++) {
+  for (size_t i=0; i<=3; i++) {
     q_in[i] = q_in[i] * iqn;
     if (q_in[0] < 0)
       q[i] = -q_in[i];
@@ -144,7 +145,6 @@ static void __euler2quat(T *q, const T *eu){
   }
 }
 
-
 template <typename T>
 static void __euler2dcm(T *Cnb,const T *eu){
   T phi, theta, psi;
@@ -152,9 +152,9 @@ static void __euler2dcm(T *Cnb,const T *eu){
   T cth, sth;
   T cp,  sp;
 
-  phi   = eu[1];   // roll
-  theta = eu[2];   // pitch
-  psi   = eu[3];   // yaw
+  phi   = eu[0];   // roll
+  theta = eu[1];   // pitch
+  psi   = eu[2];   // yaw
 
   cph = cos(phi);
   sph = sin(phi);
@@ -174,6 +174,135 @@ static void __euler2dcm(T *Cnb,const T *eu){
   Cnb[8] = cph*cth;
 }
 
+template <typename T>
+static void __dcm2euler(T *eu,const T *Cnb){
+  T Cnb11, Cnb21, Cnb31, Cnb32, Cnb33;
+  T phi, theta, psi;
+  const T c2pi = 6.283185307179586;
+  Cnb11 = Cnb[0];
+  Cnb21 = Cnb[3];
+  Cnb31 = Cnb[6];
+  Cnb32 = Cnb[7];
+  Cnb33 = Cnb[8];
+
+  phi   = atan2( Cnb32, Cnb33);                         // roll
+  theta = atan2(-Cnb31, sqrt(Cnb32*Cnb32+Cnb33*Cnb33)); // pitch
+  psi   = atan2( Cnb21, Cnb11);                         // yaw
+
+  if (psi < 0)
+    psi = psi+c2pi;
+
+  eu[0] = phi;
+  eu[1] = theta;
+  eu[2] = psi;
+}
+
+template <typename T>
+static void __dcm2quat(T *q, const T *Cnb){
+  T Cnb11, Cnb12, Cnb13;
+  T Cnb21, Cnb22, Cnb23;
+  T Cnb31, Cnb32, Cnb33;
+  T qnb[4];
+  T trC;
+  T P[4];
+  T iqn;
+  T mP;
+  size_t sw;
+
+  Cnb11 = Cnb[0]; Cnb12 = Cnb[1]; Cnb13 = Cnb[2];
+  Cnb21 = Cnb[3]; Cnb22 = Cnb[4]; Cnb23 = Cnb[5];
+  Cnb31 = Cnb[6]; Cnb32 = Cnb[7]; Cnb33 = Cnb[8];
+
+  trC = Cnb11 + Cnb22 + Cnb33;
+
+  P[0] = 1+trC;
+  P[1] = 1+2*Cnb11-trC;
+  P[2] = 1+2*Cnb22-trC;
+  P[3] = 1+2*Cnb33-trC;
+
+  //mP = max([P1 P2 P3 P4]);
+  mP = P[0];
+  sw = 0;
+  for (size_t i = 1; i<4; i++){
+    if (mP<P[i]){
+      mP = P[i];
+      sw = i;
+    }
+  }
+
+  switch (sw){
+    case 0:
+      qnb[0] = sqrt(P[0])/2;
+      qnb[1] = (Cnb32-Cnb23)/(4*qnb[0]);
+      qnb[2] = (Cnb13-Cnb31)/(4*qnb[0]);
+      qnb[3] = (Cnb21-Cnb12)/(4*qnb[0]);
+    break;
+    case 1:
+      qnb[1] = sqrt(P[1])/2;
+      qnb[2] = (Cnb21+Cnb12)/(4*qnb[1]);
+      qnb[3] = (Cnb13+Cnb31)/(4*qnb[1]);
+      qnb[0] = (Cnb32-Cnb23)/(4*qnb[1]);
+    break;
+    case 2:
+      qnb[2] = sqrt(P[2])/2;
+      qnb[3] = (Cnb32+Cnb23)/(4*qnb[2]);
+      qnb[0] = (Cnb13-Cnb31)/(4*qnb[2]);
+      qnb[1] = (Cnb21-Cnb12)/(4*qnb[2]);
+    break;
+    case 3:
+      qnb[3] = sqrt(P[3])/2;
+      qnb[0] = (Cnb21-Cnb12)/(4*qnb[3]);
+      qnb[1] = (Cnb13+Cnb31)/(4*qnb[3]);
+      qnb[2] = (Cnb32+Cnb23)/(4*qnb[3]);
+    break;
+    default:
+    break;
+  }
+
+  iqn = 1 / matrix_modulus(qnb, 4);
+
+   // normalize and negate if q0<0
+   for (size_t i=0; i<=3; i++) {
+     qnb[i] = qnb[i] * iqn;
+     if (qnb[0] < 0)
+       q[i] = -qnb[i];
+     else{
+       q[i] = qnb[i];
+     }
+   }
+}
+
+
+
+
+template <typename T>
+static void __quat2dcm(T *Cnb, const T *q){
+  T Cnb11, Cnb12, Cnb13;
+  T Cnb21, Cnb22, Cnb23;
+  T Cnb31, Cnb32, Cnb33;
+  T Q1, Q2, Q3, Q4;
+  T Q1_2, Q2_2, Q3_2, Q4_2;
+
+  Q1 = q[0]; Q2 = q[1]; Q3 = q[2]; Q4 = q[3];
+  Q1_2 = Q1*Q1;
+  Q2_2 = Q2*Q2;
+  Q3_2 = Q3*Q3;
+  Q4_2 = Q4*Q4;
+  Cnb11 = Q1_2+Q2_2-Q3_2-Q4_2;
+  Cnb22 = Q1_2-Q2_2+Q3_2-Q4_2;
+  Cnb33 = Q1_2-Q2_2-Q3_2+Q4_2;
+
+  Cnb12 = 2*(Q2*Q3-Q1*Q4);
+  Cnb13 = 2*(Q2*Q4+Q1*Q3);
+  Cnb21 = 2*(Q2*Q3+Q1*Q4);
+  Cnb23 = 2*(Q3*Q4-Q1*Q2);
+  Cnb31 = 2*(Q2*Q4-Q1*Q3);
+  Cnb32 = 2*(Q3*Q4+Q1*Q2);
+
+  Cnb[0] = Cnb11; Cnb[1] = Cnb12; Cnb[2] = Cnb13;
+  Cnb[3] = Cnb21; Cnb[4] = Cnb22; Cnb[5] = Cnb23;
+  Cnb[6] = Cnb31; Cnb[7] = Cnb32; Cnb[8] = Cnb33;
+}
 
 template <typename T>
 static void __quat2euler(T *e,const T *q){
@@ -206,6 +335,7 @@ static void __quat2euler(T *e,const T *q){
   e[1] = eu_int[1];
   e[2] = eu_int[2];
 }
+
 /**
  *
  */
@@ -231,6 +361,30 @@ void Euler2DCM(MatrixUnsafe<T> *Cnb, const Vector3d<T> *eu){
   eu_int = eu->getArray();
   Cnb_int = Cnb->getArray();
   __euler2dcm<T>(Cnb_int, eu_int);
+}
+
+template <typename T>
+void DCM2Euler(Vector3d<T> *eu, const  MatrixUnsafe<T> *Cnb){
+  T *eu_int, *Cnb_int;
+  eu_int = eu->getArray();
+  Cnb_int = Cnb->getArray();
+  __dcm2euler<T>(eu_int, Cnb_int);
+}
+
+template <typename T>
+void DCM2Quat(Quaternion<T> *q, const  MatrixUnsafe<T> *Cnb){
+  T *q_int, *Cnb_int;
+  q_int = q->getArray();
+  Cnb_int = Cnb->getArray();
+  __dcm2quat<T>(q_int, Cnb_int);
+}
+
+template <typename T>
+void Quat2DCM(MatrixUnsafe<T> *Cnb, const Quaternion<T> *q){
+  T *q_int, *Cnb_int;
+  q_int = q->getArray();
+  Cnb_int = Cnb->getArray();
+  __quat2dcm<T>(Cnb_int, q_int);
 }
 
 /**
@@ -264,5 +418,21 @@ void QuatRot(Vector3d<T> *v_rot, const Quaternion<T> *q, const Vector3d<T> *v_in
   (*v_rot)(2) = qVr(3);
 }
 
+template <typename T>
+bool isCorrect(const Quaternion<T> &q){
+  if (
+      isinf(q(0)) || isnan(q(0)) ||
+      isinf(q(1)) || isnan(q(1)) ||
+      isinf(q(2)) || isnan(q(2)) ||
+      isinf(q(3)) || isnan(q(3))
+     )
+    return CH_FAILED;
+  else
+    return CH_SUCCESS;
+}
+
 } //namespace matrix
+
 #endif /* QUATERNION_HPP_ */
+
+
