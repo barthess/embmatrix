@@ -1,7 +1,7 @@
 #ifndef MATRIX2_H
 #define MATRIX2_H
 
-#include "platform.h"
+#include "matrix_platform.h"
 #include "string.h"
 #include "matrix_primitives.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef MATRIX_DBG_HPP_
-#define MATRIX_DBG_HPP_
+#ifndef MATRIX_PLATFORM_HPP_
+#define MATRIX_PLATFORM_HPP_
 
 #if defined(_CHIBIOS_RT_)
   #define matrixDbgCheck(a,b) chDbgCheck(a,b)
@@ -20,4 +20,4 @@
   #define matrixDbgPrint(msg) { std::cout << msg; }
 #endif
 
-#endif /* MATRIX_DBG_HPP_ */
+#endif /* MATRIX_PLATFORM_HPP_ */
