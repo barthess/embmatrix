@@ -2,6 +2,7 @@
 #include <errno.h>
 
 #include "ch.h"
+#include "hal.h"
 
 #include "gcc_stubs.hpp"
 
@@ -15,7 +16,7 @@ extern "C" {
 #endif
 void _exit(int status){
    (void) status;
-   chSysHalt();
+   osalSysHalt("");
    while(TRUE){}
 }
 #ifdef __cplusplus
@@ -66,7 +67,7 @@ void _open_r(void){
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void __cxa_pure_virtual() { chDbgPanic("Pure virtual function call."); }
+  void __cxa_pure_virtual() {osalSysHalt("Pure virtual function call."); }
 #ifdef __cplusplus
 }
 #endif
