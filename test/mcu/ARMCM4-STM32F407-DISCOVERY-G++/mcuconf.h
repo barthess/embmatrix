@@ -29,7 +29,6 @@
  */
 
 #define STM32F4xx_MCUCONF
-#define STM32_USE_REVISION_A_FIX
 
 /*
  * HAL driver system settings.

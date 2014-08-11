@@ -29,6 +29,7 @@ memory_heap_t MatrixHeap;
 #define MATRIX_HEAP_SIZE    65536
 static void *matrix_heap_buf = (void *)0x10000000;
 
+
 #define matrix_size (8 * 32 * 32)
 MEMORYPOOL_DECL(matrix_pool, matrix_size, chCoreAllocI);
 
