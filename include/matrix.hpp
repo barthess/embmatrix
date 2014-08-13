@@ -171,13 +171,6 @@ template <typename T, int m, int n, int p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left, const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
   matrix_multiply(m, n, p, left.M, right.M, ret.M);
-
-//  Matrix<T, m, p> test, ref;
-//  matrix_multiply_slow(m, n, p, left.M, right.M, test.M);
-//
-//  ref = ret - test;
-//  for (size_t i=0; i<m*p; i++)
-//    osalDbgCheck((ref.M[i] < 0.001) && (ref.M[i] > -0.001));
   return ret;
 }
 
@@ -188,6 +181,34 @@ template <typename T, int m, int n>
 Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
   Matrix<T, n, m> ret;
   matrix_transpose(m, n, left.M, ret.M);
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, int m, int n, int p, int q>
+void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
+                                                size_t row, size_t col) {
+  matrixDbgCheck((row + p) <= m && (col + q) <= n);
+  T *ap, *pp;
+  for (size_t i = 0; i<p; i++){
+    ap = &acceptor.M[n*(row+i) + col];
+    pp = &patch.M[i*q];
+    memcpy(ap, pp, sizeof(T)*q);
+  }
+}
+
+/**
+ *
+ */
+template <typename T, int r, int c>
+Matrix<T, 1, c> getRow(const Matrix<T, r, c> &donor, size_t row){
+  matrixDbgCheck(row < c);
+
+  Matrix<T, 1, c> ret;
+  T *M = &donor.M[row*c];
+  memcpy(ret.M, M, sizeof(T) * c);
   return ret;
 }
 
