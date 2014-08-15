@@ -17,8 +17,8 @@ static inline void *matrix_malloc(size_t len) {
   void *ret;
   uint32_t start = chSysGetRealtimeCounterX();
   matrix_malloc_cnt++;
-  ret = chHeapAlloc(&MatrixHeap, len);
-  //ret = chPoolAlloc(&matrix_pool);
+  //ret = chHeapAlloc(&MatrixHeap, len);
+  ret = chPoolAlloc(&matrix_pool);  (void)len;
   osalDbgCheck(NULL != ret);
   matrix_alloc_time += chSysGetRealtimeCounterX() - start;
   return ret;
@@ -28,8 +28,8 @@ static inline void matrix_free(void *p) {
   uint32_t start = chSysGetRealtimeCounterX();
   if (NULL != p){
     matrix_free_cnt++;
-    chHeapFree(p);
-    //chPoolFree(&matrix_pool, p);
+    //chHeapFree(p);
+    chPoolFree(&matrix_pool, p);
   }
   matrix_free_time += chSysGetRealtimeCounterX() - start;
 }
