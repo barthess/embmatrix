@@ -30,9 +30,9 @@ T matrix_modulus(const T *A, size_t len){
  */
 template <typename T>
 void matrix_normalize(T *A, size_t len){
-  T R = matrix_modulus(A, len);
+  T R = 1 / matrix_modulus(A, len);
   for (size_t i=0; i<len; i++)
-    A[i] /= R;
+    A[i] *= R;
 }
 
 /**
@@ -46,26 +46,7 @@ void matrix_transpose(size_t m, size_t n, const T *A, T *B){
       B[j*m + i] = A[i*n + j];
 }
 
-/**
- * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
- */
-template <typename T>
-void matrix_multiply_slower(size_t m, size_t p, size_t n,
-                     const T *A, const T *B, T *C){
-  size_t i, j, k;
-  T tmp;
-
-  for(i=0; i<m; i++){     //each row in A
-    for(j=0; j<n; j++){   //each column in B
-      tmp = 0;
-      for(k=0; k<p; k++){ //each element in row A & column B
-        tmp += A[i*p + k] * B[k*n + j];
-      }
-      C[i*n + j] = tmp;
-    }
-  }
-}
-
+#if CORTEX_HAS_FPU
 /**
  * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
  * @note    Faster variant developing for using MAC instructions from
@@ -121,13 +102,18 @@ void matrix_multiply(size_t m, size_t p, size_t n,
   for(size_t i=0; i<m; i++){
     for(size_t j=0; j<n; j++){
       T s = 0;
-      for(size_t k=0; k<Nround; k+=4){
+      size_t k;
+
+      /* main cycle */
+      for(k=0; k<Nround; k+=4){
         s = A[i*p + k]   * B[k*n + j]     +
             A[i*p + k+1] * B[(k+1)*n + j] +
             A[i*p + k+2] * B[(k+2)*n + j] +
             A[i*p + k+3] * B[(k+3)*n + j];
       }
-      for (size_t k=Nround; k<p; k++){
+
+      /* tail processing */
+      for (k=Nround; k<p; k++){
         s += A[i*p + k] * B[k*n + j];
       }
 
@@ -135,6 +121,27 @@ void matrix_multiply(size_t m, size_t p, size_t n,
     }
   }
 }
+#else /* CORTEX_HAS_FPU */
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ */
+template <typename T>
+void matrix_multiply(size_t m, size_t p, size_t n,
+                     const T *A, const T *B, T *C){
+  size_t i, j, k;
+  T tmp;
+
+  for(i=0; i<m; i++){     //each row in A
+    for(j=0; j<n; j++){   //each column in B
+      tmp = 0;
+      for(k=0; k<p; k++){ //each element in row A & column B
+        tmp += A[i*p + k] * B[k*n + j];
+      }
+      C[i*n + j] = tmp;
+    }
+  }
+}
+#endif /* CORTEX_HAS_FPU */
 
 /**
  * @brief   Copy function
