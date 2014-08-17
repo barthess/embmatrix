@@ -11,28 +11,29 @@ extern uint32_t matrix_alloc_time, matrix_free_time;
 extern memory_pool_t matrix_pool;
 
 #define matrixDbgCheck(a) osalDbgCheck(a)
+#define matrixDbgPanic(msg) osalSysHalt(msg)
 #define matrixDbgPrint(msg) {;}
 
-static inline void *matrix_malloc(size_t len) {
-  void *ret;
-  uint32_t start = chSysGetRealtimeCounterX();
-  matrix_malloc_cnt++;
-  //ret = chHeapAlloc(&MatrixHeap, len);
-  ret = chPoolAlloc(&matrix_pool);  (void)len;
-  osalDbgCheck(NULL != ret);
-  matrix_alloc_time += chSysGetRealtimeCounterX() - start;
-  return ret;
-}
-
-static inline void matrix_free(void *p) {
-  uint32_t start = chSysGetRealtimeCounterX();
-  if (NULL != p){
-    matrix_free_cnt++;
-    //chHeapFree(p);
-    chPoolFree(&matrix_pool, p);
-  }
-  matrix_free_time += chSysGetRealtimeCounterX() - start;
-}
+//static inline void *matrix_malloc(size_t size) {
+//  void *ret;
+//  uint32_t start = chSysGetRealtimeCounterX();
+//  matrix_malloc_cnt++;
+//  //ret = chHeapAlloc(&MatrixHeap, size);
+//  ret = chPoolAlloc(&matrix_pool);  (void)size;
+//  osalDbgCheck(NULL != ret);
+//  matrix_alloc_time += chSysGetRealtimeCounterX() - start;
+//  return ret;
+//}
+//
+//static inline void matrix_free(void *p) {
+//  uint32_t start = chSysGetRealtimeCounterX();
+//  if (NULL != p){
+//    matrix_free_cnt++;
+//    //chHeapFree(p);
+//    chPoolFree(&matrix_pool, p);
+//  }
+//  matrix_free_time += chSysGetRealtimeCounterX() - start;
+//}
 
 #else
   #include <iostream>

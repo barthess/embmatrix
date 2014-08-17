@@ -18,20 +18,18 @@
 #include "hal.h"
 #include "string.h"
 
-#include "matrix_test.hpp"
+#include "kalman.hpp"
 
 using namespace chibios_rt;
 
 #define rccEnableCCM(lp) rccEnableAHB1(RCC_AHB1ENR_CCMDATARAMEN, lp)
 #define rccDisableCCM(lp) rccDisableAHB1(RCC_AHB1ENR_CCMDATARAMEN, lp)
 
-memory_heap_t MatrixHeap;
-#define MATRIX_HEAP_SIZE    65536
-static void *matrix_heap_buf = (void *)0x10000000;
-
-
-#define matrix_size (8 * 32 * 32)
-MEMORYPOOL_DECL(matrix_pool, matrix_size, chCoreAllocI);
+//memory_heap_t MatrixHeap;
+//#define MATRIX_HEAP_SIZE    65536
+//static void *matrix_heap_buf = (void *)0x10000000;
+//#define matrix_size (8 * 32 * 32)
+//memory_pool_t matrix_pool;
 
 /*
  * Application entry point.
@@ -49,18 +47,21 @@ int main(void) {
   System::init();
 
 
-  rccEnableCCM(false);
-  memset(matrix_heap_buf, 0x55, MATRIX_HEAP_SIZE);
-  chHeapObjectInit(&MatrixHeap, matrix_heap_buf, MATRIX_HEAP_SIZE);
+  //rccEnableCCM(false);
+  //memset(matrix_heap_buf, 0x55, MATRIX_HEAP_SIZE);
+  //chHeapObjectInit(&MatrixHeap, matrix_heap_buf, MATRIX_HEAP_SIZE);
+  //chPoolObjectInit(&matrix_pool, matrix_size, chCoreAllocI);
 
-  chPoolObjectInit(&matrix_pool, matrix_size, chCoreAllocI);
+  matrixMempoolStart();
+
+  Kalman *kalman = new Kalman();
 
   /*
    * Serves timer events.
    */
   while (true) {
     //BaseThread::sleep(MS2ST(50));
-    matrix_test();
+    kalman->run();
   }
 
   return 0;
