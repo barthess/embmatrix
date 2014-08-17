@@ -5,35 +5,16 @@
 #include "gcc_stubs.hpp"
 #include "misc_math.hpp"
 
-extern memory_heap_t MatrixHeap;
-extern size_t matrix_malloc_cnt, matrix_free_cnt;
-extern uint32_t matrix_alloc_time, matrix_free_time;
-extern memory_pool_t matrix_pool;
+#define matrixDbgCheck(a)           osalDbgCheck(a)
+#define matrixDbgPanic(msg)         osalSysHalt(msg)
+#define matrixDbgPrint(msg)         {;}
 
-#define matrixDbgCheck(a) osalDbgCheck(a)
-#define matrixDbgPanic(msg) osalSysHalt(msg)
-#define matrixDbgPrint(msg) {;}
+#define MATRIX_MEMPOOL_LEN          9
+#define MATRIX_MEMPOOL_MIN_SIZE     (sizeof(float) * 4)
 
-//static inline void *matrix_malloc(size_t size) {
-//  void *ret;
-//  uint32_t start = chSysGetRealtimeCounterX();
-//  matrix_malloc_cnt++;
-//  //ret = chHeapAlloc(&MatrixHeap, size);
-//  ret = chPoolAlloc(&matrix_pool);  (void)size;
-//  osalDbgCheck(NULL != ret);
-//  matrix_alloc_time += chSysGetRealtimeCounterX() - start;
-//  return ret;
-//}
-//
-//static inline void matrix_free(void *p) {
-//  uint32_t start = chSysGetRealtimeCounterX();
-//  if (NULL != p){
-//    matrix_free_cnt++;
-//    //chHeapFree(p);
-//    chPoolFree(&matrix_pool, p);
-//  }
-//  matrix_free_time += chSysGetRealtimeCounterX() - start;
-//}
+void matrixMempoolStart(void);
+void *matrix_malloc( size_t pool_index, size_t size);
+void matrix_free(size_t pool_index, void *mem);
 
 #else
   #include <iostream>

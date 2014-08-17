@@ -2,7 +2,6 @@
 #define MATRIX_HPP_
 
 #include "matrix_osal.hpp"
-#include "matrix_mempool.hpp"
 #include "string.h"
 #include "matrix_primitives.hpp"
 
@@ -16,7 +15,7 @@ public:
 
 public:
   ~Matrix(void) {
-    matrix_free(M, pool_index());
+    matrix_free(pool_index(), M);
   }
 
   /**
@@ -36,12 +35,8 @@ public:
 //    memcpy(this->M, src.M, msize());
 //  }
 
-
-
   Matrix(const Matrix&) = delete; //запретить копирование
   void operator=(const Matrix&) = delete; //запретить присваивание
-
-
 
   /**
    *
@@ -81,7 +76,7 @@ public:
     if (this == &src)
       return *this;
     else{
-      matrix_free(M, pool_index());
+      matrix_free(pool_index(), M);
       M = src.M;
       src.M = NULL;
       return *this;
@@ -148,37 +143,41 @@ public:
   }
 
 private:
+
+  /**
+   * @brief Return matrix size in bytes
+   */
+  constexpr size_t msize(void){
+    return sizeof(T) * r * c;
+  }
+
   /**
    * @brief Determine closest suitable pool size
    */
   constexpr size_t pool_index(void) {
     size_t firstone = sizeof(size_t) * 8 - 1;
-    size_t size = msize() / MATRIX_MEMPOOL_MIN_SIZE;
+    size_t size = msize();
 
     if (0 == size)
       return 0;
 
     while(firstone-- > 0){
-      if ((size & ((size_t)1 << firstone)) > 0)
+      if ((size & (1 << firstone)) > 0)
         break;
     }
 
     if (0 == firstone)
       return 0;
 
-    if ((size & (((size_t)1 << firstone) - 1)) == 0)
-      return firstone;
+    if ((size & ((1 << firstone) - 1)) == 0)
+      return firstone - 4;
     else
-      return firstone + 1;
-  }
-
-  constexpr size_t msize(void){
-    return sizeof(T) * r * c;
+      return firstone - 3;
   }
 
   void _default_ctor(void){
     //this->M = static_cast<T *>(matrix_malloc(msize()));
-    this->M = static_cast<T *>(matrix_malloc(pool_index()));
+    this->M = static_cast<T *>(matrix_malloc(pool_index(), msize()));
   }
 
   /**

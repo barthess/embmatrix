@@ -31,10 +31,6 @@ float Kalman::run(void) {
 
   Matrix<klmfp, 3, 3> Patch(0);
 
-  matrix_alloc_time = 0;
-  matrix_free_time = 0;
-  matrix_total_time = 0;
-
   for(size_t i=0; i<100; i++){
     uint32_t start = chSysGetRealtimeCounterX();
     R = T * J * F * ~T;
@@ -47,6 +43,10 @@ float Kalman::run(void) {
     matrix_total_time += chSysGetRealtimeCounterX() - start;
   }
   chThdSleepMilliseconds(1); /* hack to enforce stack check by chibios */
+
+  matrix_alloc_time = 0;
+  matrix_free_time = 0;
+  matrix_total_time = 0;
 
   return 0;
 }
