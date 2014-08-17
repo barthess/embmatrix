@@ -2,7 +2,6 @@
 #define MATRIX_PRIMITIVES_H
 
 #include <stdint.h>
-#include <string.h> // for memcpy()
 
 namespace matrix {
 
