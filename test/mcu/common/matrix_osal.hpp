@@ -3,7 +3,6 @@
 
 #if defined(_CHIBIOS_RT_)
 #include "gcc_stubs.hpp"
-#include "misc_math.hpp"
 
 #define matrixDbgCheck(a)           osalDbgCheck(a)
 #define matrixDbgPanic(msg)         osalSysHalt(msg)
