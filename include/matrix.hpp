@@ -228,7 +228,7 @@ void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
  *
  */
 template <typename T, int r, int c>
-Matrix<T, 1, c> getRow(const Matrix<T, r, c> &donor, size_t row){
+Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row){
   matrixDbgCheck(row < c);
 
   Matrix<T, 1, c> ret;

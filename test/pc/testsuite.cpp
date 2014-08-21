@@ -2,177 +2,55 @@
 
 #include "string.h"
 #include "matrix.hpp"
-#include "vector_unsafe.hpp"
+#include "kalman.hpp"
+
 using namespace matrix;
 
-/**
- * @brief   Fuzzy compare float values
- */
-template <typename T>
-bool fuzzy_compare(T reference, T val, T clearance){
-  if((val > (reference + clearance)) || (val < reference - clearance))
-    return false;
-  else
-    return true;
-}
+uint32_t matrix_alloc_time = 0;
+uint32_t matrix_free_time = 0;
 
-/**
- * @brief compare
- * @param src
- * @param ref
- * @return
- */
-template <typename T>
-bool compare(const MatrixUnsafe<T> &src, const MatrixUnsafe<T> &ref){
-  if((src.getCol() != ref.getCol()) || (src.getRow() != ref.getRow()))
-    return false;
+size_t matrix_malloc_cnt = 0;
+size_t matrix_free_cnt = 0;
 
-  size_t len = ref.getCol() * ref.getRow();
-  T *src_m = src.getArray();
-  T *ref_m = ref.getArray();
-
-  for (uint32_t i=0; i<len; i++){
-    if (! fuzzy_compare(ref_m[i], src_m[i], 0.0001))
-      return false;
-  }
-  return true;
-}
-
-
-/**
- * @brief gen_non_singular_array
- */
-template <typename T>
-static void nonsingular(T *a, size_t n){
-  srand(time(NULL));
-  T seed = rand() % 20 + 2;
-  size_t i=0;
-
-  for (i=0; i<(n*n); i++){
-    a[i] = 1;
-  }
-
-  for (i=0; i<(n*n); i+=(n+1)){
-    a[i] = seed++;
-  }
-}
+static const klmfp init[] = {1,2,3, 4,5,6, 7,8,9, 10,11,12, 10,11,12,13,
+    1,2,3, 4,5,6, 7,8,9, 10,11,12, 10,11,12,13};
+//static const float init[] = {1,2,3, 4,5,6, 7,8,9,};
+//static const float init[] = {1,2,3};
 
 /**
  *
  */
-template <typename T>
-static void identity(T *a, size_t n){
-  size_t i=0;
-
-  for (i=0; i<(n*n); i++){
-    a[i] = 0;
-  }
-
-  for (i=0; i<(n*n); i+=(n+1)){
-    a[i] = 1;
-  }
+Kalman::Kalman(void) :
+  R(0.5), F(0.7), T(0.8), J(1), Ttest(2.3), RTtest(init, sizeof(init))
+{
+  return;
 }
 
-/**
- * @brief identity_mul_test
- */
-template <typename T>
-static void identity_mul_test(MatrixUnsafe<T> &A, MatrixUnsafe<T> &I, MatrixUnsafe<T> &Tmp){
-  std::cout << "identity multiplication test size: " << A.getCol() << "\n";
-  A.mul(I, Tmp);
-  assert(compare(A, Tmp));
 
-  I.mul(A, Tmp);
-  assert(compare(A, Tmp));
-}
+float Kalman::run(void) {
 
-template <typename T>
-static void inv_test(MatrixUnsafe<T> &A, MatrixUnsafe<T> &B, MatrixUnsafe<T> &I, MatrixUnsafe<T> &Tmp){
-  std::cout << "inversion test size: " << A.getCol() << "\n";
+  Matrix<klmfp, 3, 3> Patch(0);
 
-  Tmp = A;
-  A.inverse();
-  A.inverse();
-  assert(compare(A, Tmp));
-
-  A = Tmp;
-  A.inverse();
-  A.mul(Tmp, B);
-  assert(compare(B, I));
-
-  Tmp.mul(A, B);
-  assert(compare(B, I));
-}
-
-/**
- * 
- */
-static void base_test(void){
-  //matrixDbgCheck((start > 0) && (start < finish), "");
-  //int32_t result;
-  uint32_t m = 1;
-  size_t S = 0;
-
-  double a[10000], b[10000], c[10000], i[10000];
-
-  for (m=1; m<100; m++){
-
-    S = sizeof(a[0]) * m*m;
-
-    nonsingular(a, m);
-    identity(i, m);
-
-    memcpy(b, a, S);
-    memcpy(c, a, S);
-
-    MatrixUnsafe<double> *A = new MatrixUnsafe<double>(a, m, m, S);
-    MatrixUnsafe<double> *B = new MatrixUnsafe<double>(b, m, m, S);
-    MatrixUnsafe<double> *TMP = new MatrixUnsafe<double>(c, m, m, S);
-    MatrixUnsafe<double> *I = new MatrixUnsafe<double>(i, m, m, S);
-
-    identity_mul_test(*A, *I, *TMP);
-    inv_test(*A, *B, *I, *TMP);
-
-    delete B;
-    delete A;
-    delete TMP;
-    delete I;
+  for(size_t i=0; i<5000; i++){
+    R = T * J * F * ~T;
+    R = R * F;
+    J = R + T;
+    patch(F, Patch, 3, 1);
+    patch(F, row(Patch, 0), 10, 11);
+    //RTtest = !J * ~Ttest;
+    RTtest = J * ~Ttest;
   }
 
-  Matrix<float, 3, 3> M;
-  const float Mv[] = {1,2,3, 4,5,6, 7,8,9};
-  M.init(Mv);
-
-  Matrix<float, 3, 3> N;
-  const float Nv[] = {1,0,0, 0,1,0, 0,0,1};
-  N.init(Nv);
-
-  float mm[9];
-  MatrixUnsafe<float> R(mm, 3, 3, sizeof(mm));
-  R = M + N;
-
-  for (int i=0; i<9; i++){
-    std::cout << mm[i];
-  }
-
-  R = ~M;
-  std::cout << "\n";
-
-  for (int i=0; i<9; i++){
-    std::cout << mm[i];
-  }
-
-  /**/
-  float vect[3];
-  VectorUnsafe<float> V(vect, 3, sizeof(vect));
-  V.init(Mv);
-  R = N * V;
+  return 0;
 }
 
 /**
  * @brief main
  * @return
  */
+
+Kalman *kalman = new Kalman();
+
 int main(void){
-  base_test();
+  kalman->run();
 }

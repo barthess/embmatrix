@@ -1,4 +1,4 @@
-INC = ../../include
+INC = -I../../include -I../mcu/common
 CC = g++
 CPPWARN = -Wall \
 		  -Wextra \
@@ -10,12 +10,12 @@ CPPWARN = -Wall \
 		  -Wold-style-cast \
 		  -Wnon-virtual-dtor 
 
-CFLAGS = -O0 -ggdb
-CPPFLAGS = $(CFLAGS) $(CPPWARN) -I$(INC)
+CFLAGS = -O2 -ggdb -std=gnu++11
+CPPFLAGS = $(CFLAGS) $(CPPWARN) $(INC)
 
 DEPS = $(INCDIR)*.hpp $(INCDIR)*.h 
 
-all: testsuite
+all: testsuite Makefile
 
 testsuite: $(INCDIR)
 

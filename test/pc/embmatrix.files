@@ -1,1 +1,4 @@
 testsuite.cpp
+../mcu/common/kalman.cpp
+../mcu/common/kalman.hpp
+../mcu/common/matrix_osal.hpp

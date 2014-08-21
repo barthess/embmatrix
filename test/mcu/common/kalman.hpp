@@ -12,6 +12,7 @@ public:
     return;
   }
   float run(void);
+#if defined(_CHIBIOS_RT_)
   void *operator new(size_t size){
     matrixDbgCheck(sizeof(Kalman) == size);
     return chCoreAlloc(size);
@@ -20,6 +21,7 @@ public:
     (void)mem;
     matrixDbgPanic("Can not delete object because allocated memory can not be deallocate");
   }
+#endif
 private:
   matrix::Matrix<klmfp, 32, 32> R, F, T, J;
   matrix::Matrix<klmfp, 1, 32> Ttest;

@@ -12,22 +12,29 @@
 #define MATRIX_MEMPOOL_MIN_SIZE     (sizeof(float) * 4)
 
 void matrixMempoolStart(void);
-void *matrix_malloc( size_t pool_index, size_t size);
+void *matrix_malloc(size_t pool_index, size_t size);
 void matrix_free(size_t pool_index, void *mem);
 
-#else
+#else /* defined(_CHIBIOS_RT_) */
   #include <iostream>
   #include <cstdlib>
   #include <assert.h>
   #include <math.h>
-  #define matrixDbgCheck(c, msg) {              \
+  #define matrixDbgCheck(c) {                   \
     if (!(c)){                                  \
-      std::cout << msg;                         \
       throw 0;                                  \
       exit(1);                                  \
     }                                           \
   }
   #define matrixDbgPrint(msg) { std::cout << msg; }
-#endif
+static inline void *matrix_malloc(size_t pool_index, size_t size){
+  (void)pool_index;
+  return malloc(size);
+}
+static inline void matrix_free(size_t pool_index, void *mem){
+  (void)pool_index;
+  free(mem);
+}
+#endif /* defined(_CHIBIOS_RT_) */
 
 #endif /* MATRIX_OSAL_HPP_ */

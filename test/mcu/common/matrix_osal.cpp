@@ -24,6 +24,7 @@ void *matrix_malloc(size_t pool_index, size_t size) {
   matrixDbgCheck(pool_index < MATRIX_MEMPOOL_LEN);
   matrixDbgCheck(pool_array[pool_index].mp_object_size >= size);
   ret = chPoolAlloc(&pool_array[pool_index]);
+  //matrixDbgCheck(NULL == ret);
   matrixDbgCheck(NULL != ret);
   matrix_alloc_time += chSysGetRealtimeCounterX() - start;
   return ret;

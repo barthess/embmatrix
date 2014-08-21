@@ -37,7 +37,7 @@ float Kalman::run(void) {
     R = R * F;
     J = R + T;
     patch(F, Patch, 3, 1);
-    patch(F, getRow(Patch, 0), 10, 11);
+    patch(F, row(Patch, 0), 10, 11);
     //RTtest = !J * ~Ttest;
     RTtest = J * ~Ttest;
     matrix_total_time += chSysGetRealtimeCounterX() - start;
