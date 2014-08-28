@@ -62,7 +62,7 @@ public:
    */
   Matrix(const T *array, size_t arraysize) {
     matrixDbgPrint("Matrix const array constructor\n");
-    matrixDbgCheck(msize() == arraysize);
+    static_assert(msize() == arraysize, "sizes mismatch");
     _default_ctor();
     memcpy(this->M, array, arraysize);
   }
@@ -88,7 +88,7 @@ public:
    */
   Matrix& operator ! (void){
     matrixDbgPrint("Matrix inverse operator\n");
-    matrixDbgCheck(c == r); /* matrix must be square */
+    static_assert(c == r, "matrix must be square");
 
     /* The function returns 1 on success, 0 on failure. */
     int inv_res = matrix_inverse(c, M);
