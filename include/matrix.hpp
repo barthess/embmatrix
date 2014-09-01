@@ -60,9 +60,9 @@ public:
   /**
    *
    */
-  Matrix(const T *array, size_t arraysize) {
+  Matrix(const T *array, const size_t arraysize) {
     matrixDbgPrint("Matrix const array constructor\n");
-    static_assert(msize() == arraysize, "sizes mismatch");
+    matrixDbgCheck(msize() == arraysize); /* sizes mismatch */
     _default_ctor();
     memcpy(this->M, array, arraysize);
   }
