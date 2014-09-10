@@ -2,7 +2,6 @@
 #define MATRIX_OSAL_HPP_
 
 #if defined(_CHIBIOS_RT_)
-#include "gcc_stubs.hpp"
 
 #define matrixDbgCheck(a)           osalDbgCheck(a)
 #define matrixDbgPanic(msg)         osalSysHalt(msg)
