@@ -87,7 +87,7 @@ include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_stm32f4xx.mk
-include $(CHIBIOS)/os/various/cpp_wrappers/kernel.mk
+include $(CHIBIOS)/os/various/cpp_wrappers/chcpp.mk
 
 # Define linker script file here
 LDSCRIPT= $(PORTLD)/STM32F407xG.ld
@@ -110,8 +110,7 @@ CSRC = $(PORTSRC) \
 CPPSRC = $(CHCPPSRC) \
          main.cpp \
          ../common/matrix_osal.cpp \
-         ../common/kalman.cpp \
-         ../common/gcc_stubs.cpp
+         ../common/kalman.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
