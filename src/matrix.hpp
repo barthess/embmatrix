@@ -176,6 +176,7 @@ private:
   }
 
   void _default_ctor(void){
+    static_assert((c>0) && (r>0), "Zero size forbidden");
     //this->M = static_cast<T *>(matrix_malloc(msize()));
     this->M = static_cast<T *>(matrix_malloc(pool_index(), msize()));
   }

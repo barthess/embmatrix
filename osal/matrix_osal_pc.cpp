@@ -24,7 +24,7 @@ void *matrix_malloc(size_t pool_index, size_t size) {
   return malloc(size);
 }
 
-static inline void matrix_free(size_t pool_index, void *mem) {
+void matrix_free(size_t pool_index, void *mem) {
   (void)pool_index;
 
   free(mem);

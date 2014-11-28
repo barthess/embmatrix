@@ -1,6 +1,5 @@
 #include "hal.h"
 #include "matrix.hpp"
-#include "matrix_compare.hpp"
 #include "matrix_mempool.hpp"
 
 #include "kalman.hpp"

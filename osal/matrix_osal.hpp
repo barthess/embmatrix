@@ -1,6 +1,9 @@
 #ifndef MATRIX_OSAL_HPP_
 #define MATRIX_OSAL_HPP_
 
+#include <stdint.h>
+#include <stddef.h>
+
 void *matrix_malloc(size_t pool_index, size_t size);
 void matrix_free(size_t pool_index, void *mem);
 void matrixDbgCheck(bool a);
