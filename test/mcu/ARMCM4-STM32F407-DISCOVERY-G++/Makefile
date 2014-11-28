@@ -109,7 +109,8 @@ CSRC = $(PORTSRC) \
 # setting.
 CPPSRC = $(CHCPPSRC) \
          main.cpp \
-         ../common/matrix_osal.cpp \
+         ../../../osal/matrix_osal_chibios.cpp \
+         ../../../osal/matrix_mempool.cpp \
          ../common/kalman.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
@@ -139,6 +140,7 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(OSALINC) $(PLATFORMINC) $(BOARDINC) \
          $(CHCPPINC) \
          $(CHIBIOS)/os/various \
+         ../../../osal \
          ../../../src \
          ../common 
 

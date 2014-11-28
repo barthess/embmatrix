@@ -1,15 +1,12 @@
 #include "hal.h"
 #include "matrix.hpp"
+#include "matrix_compare.hpp"
+#include "matrix_mempool.hpp"
 
 #include "kalman.hpp"
 
 using namespace matrix;
 
-uint32_t matrix_alloc_time = 0;
-uint32_t matrix_free_time = 0;
-
-size_t matrix_malloc_cnt = 0;
-size_t matrix_free_cnt = 0;
 static uint64_t matrix_total_time = 0;
 
 static const klmfp init[] = {1,2,3, 4,5,6, 7,8,9, 10,11,12, 10,11,12,13,

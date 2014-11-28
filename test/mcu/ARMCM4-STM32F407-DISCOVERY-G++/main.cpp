@@ -19,6 +19,7 @@
 #include "string.h"
 
 #include "kalman.hpp"
+#include "matrix_mempool.hpp"
 
 using namespace chibios_rt;
 
