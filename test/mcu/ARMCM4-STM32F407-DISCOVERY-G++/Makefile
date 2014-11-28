@@ -110,8 +110,7 @@ CSRC = $(PORTSRC) \
 CPPSRC = $(CHCPPSRC) \
          main.cpp \
          ../common/matrix_osal.cpp \
-         ../common/kalman.cpp \
-         ../common/gcc_stubs.cpp
+         ../common/kalman.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
