@@ -139,7 +139,7 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(OSALINC) $(PLATFORMINC) $(BOARDINC) \
          $(CHCPPINC) \
          $(CHIBIOS)/os/various \
-         ../../../include \
+         ../../../src \
          ../common 
 
 
@@ -155,8 +155,14 @@ MCU  = cortex-m4
 
 #TRGT = arm-elf-
 TRGT = arm-none-eabi-
-CC   = ccache $(TRGT)gcc
-CPPC = ccache $(TRGT)g++
+ifeq ($(OS),Windows_NT) # workaround for crappy OS
+	CC   = $(TRGT)gcc
+	CPPC = $(TRGT)g++
+else
+	CC   = ccache $(TRGT)gcc
+	CPPC = ccache $(TRGT)g++
+endif
+
 # Enable loading with g++ only if you need C++ runtime support.
 # NOTE: You can use C++ even without C++ support if you are careful. C++
 #       runtime support makes code size explode.
