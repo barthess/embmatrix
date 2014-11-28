@@ -8,10 +8,9 @@ import numpy as np
 
 f = open("matrix_test.cpp", "w")
 
-
 CurrentTest = 0
 MAX_SIZE = 5
-
+RAND_PASSES = 10
 
 def array_to_cpp(nparray):
     st = ""
@@ -21,18 +20,27 @@ def array_to_cpp(nparray):
     st = "{" + st[0:-1] + "}"
     return st
 
-def write_function(f, m, p, n, typename):
-    global CurrentTest
-
-    f.write("bool test" + str(CurrentTest) + "(void) {\n")
+def gen_samples_uint_arange(m, p, n):
     a = np.array(np.arange(m*p))
     b = np.array(np.arange(p*n))
     c = np.dot(a.reshape(m,p), b.reshape(p,n))
-    # print (a.reshape(i,j))
-    # print (b.reshape(i,j))
-    # print (c)
     c = c.reshape(m*n)
+    return (a, b, c)
 
+def gen_samples_int_rand(m, p, n):
+    a = np.array(np.random.randint(-50, 50, m*p))
+    b = np.array(np.random.randint(-50, 50, p*n))
+    c = np.dot(a.reshape(m,p), b.reshape(p,n))
+    c = c.reshape(m*n)
+    return (a, b, c)
+
+def write_function(f, m, p, n, typename, gen_func):
+    global CurrentTest
+
+    print ("generate:", CurrentTest)
+    (a,b,c) = gen_func(m, p, n)
+
+    f.write("bool test" + str(CurrentTest) + "(void) {\n")
     f.write("  bool ret = false;\n")
     f.write("  %s a[] = %s;\n" % (typename, array_to_cpp(a)))
     f.write("  %s b[] = %s;\n" % (typename, array_to_cpp(b)))
@@ -61,10 +69,16 @@ typedef bool (*mtf)(void);
 
 """)
 
-for m in range(1, MAX_SIZE):
-    for n in range(1, MAX_SIZE):
-        for p in range(1, MAX_SIZE):
-            write_function(f, m, n, p, "unsigned int")
+def gen_code(typename, func):
+    for m in range(1, MAX_SIZE):
+        for n in range(1, MAX_SIZE):
+            for p in range(1, MAX_SIZE):
+                write_function(f, m, n, p, typename, func)
+
+gen_code("unsigned int", gen_samples_uint_arange)
+for i in range(RAND_PASSES):
+    gen_code("int", gen_samples_int_rand)
+
 
 f.write("static const size_t total_test_cnt = " + str(CurrentTest) + ";\n")
 f.write("static const mtf test_table[] = {\n")
@@ -82,10 +96,12 @@ int main(){
         std::cout << "test: " << i << std::endl;
         status = test_table[i]();
         if (false == status){
+            printf("-----------------------------------\\n");
             printf("failed\\n");
             exit(1);
         }
     }
+    printf("-----------------------------------\\n");
     printf("success\\n");
 }
 """)

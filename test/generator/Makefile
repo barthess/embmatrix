@@ -10,7 +10,7 @@ CPPWARN = -Wall \
 		  -Wold-style-cast \
 		  -Wnon-virtual-dtor 
 
-CFLAGS = -O2 -ggdb -std=gnu++11
+CFLAGS = -O0 -ggdb -std=gnu++11
 CPPFLAGS = $(CFLAGS) $(CPPWARN) $(INC)
 
 DEPS = $(INCDIR)*.hpp $(INCDIR)*.h 
@@ -20,7 +20,7 @@ all: matrix_test Makefile
 matrix_test.cpp: gen.py
 	python gen.py
 
-matrix_test: $(INCDIR)
+matrix_test: $(INCDIR) matrix_test.cpp
 	$(CC) $(CPPFLAGS) matrix_test.cpp -o matrix_test
 
 .PHONY: clean, test
