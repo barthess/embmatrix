@@ -142,14 +142,6 @@ void matrix_multiply(size_t m, size_t p, size_t n,
 }
 #endif /* CORTEX_HAS_FPU */
 
-/**
- * @brief   Copy function
- */
-//template <typename T>
-//void matrix_copy(size_t m, size_t n, const T *A, T *B){
-//  memcpy(B, A, (m * n * sizeof(A[0])));
-//}
-
 // Matrix Inversion Routine from http://www.arduino.cc/playground/Code/MatrixMath
 // * This function inverts a matrix based on the Gauss Jordan method.
 // * Specifically, it uses partial pivoting to improve numeric stability.
