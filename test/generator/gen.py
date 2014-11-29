@@ -10,7 +10,7 @@ f = open("matrix_test.cpp", "w")
 
 CurrentTest = 0
 MAX_SIZE = 5
-RAND_PASSES = 10
+RAND_PASSES = 5
 
 def array_to_cpp(nparray):
     st = ""
@@ -47,14 +47,13 @@ def write_function(f, m, p, n, typename, gen_func):
     f.write("  %s c[] = %s;\n\n" % (typename, array_to_cpp(c)))
     f.write("  Matrix<%s, %u, %u> ref(c, sizeof(c));\n" % (typename, m, n))
     f.write("  Matrix<%s, %u, %u> A(a, sizeof(a));\n" % (typename, m, p))
-    f.write("  Matrix<%s, %u, %u> B(b, sizeof(b));\n" % (typename, p, n))
-    f.write("  Matrix<%s, %u, %u> C;\n\n" % (typename, m, n))
-    f.write("  C = A * B;\n")
+    f.write("  Matrix<%s, %u, %u> B(b, sizeof(b));\n\n" % (typename, p, n))
+    f.write("  Matrix<%s, %u, %u> C = A * B;\n\n" % (typename, m, n))
     f.write("  ret = C == ref;\n\n")
     f.write("  if (!ret){\n")
-    f.write("    matrix_dbg_print(A);\n")
-    f.write("    matrix_dbg_print(B);\n")
-    f.write("    matrix_dbg_print(C);\n  }\n")
+    f.write("    matrix_fancy_print(A);\n")
+    f.write("    matrix_fancy_print(B);\n")
+    f.write("    matrix_fancy_print(C);\n  }\n")
     f.write("  return ret;\n")
     f.write("}\n\n")
     CurrentTest += 1

@@ -13,14 +13,14 @@ CPPWARN = -Wall \
 CFLAGS = -O0 -ggdb -std=gnu++11
 CPPFLAGS = $(CFLAGS) $(CPPWARN) $(INC)
 
-DEPS = $(INCDIR)*.hpp $(INCDIR)*.h 
+DEPS = ../../src/* ../../osal/*
 
 all: matrix_test Makefile
 
-matrix_test.cpp: gen.py
+matrix_test.cpp: gen.py $(DEPS)
 	python gen.py
 
-matrix_test: $(INCDIR) matrix_test.cpp
+matrix_test: matrix_test.cpp
 	$(CC) $(CPPFLAGS) matrix_test.cpp -o matrix_test
 
 .PHONY: clean, test

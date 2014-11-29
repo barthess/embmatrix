@@ -47,7 +47,7 @@ bool operator != (const Matrix<int, m, n> &A, const Matrix<int, m, n> &B) {
 }
 
 template <typename T, int m, int n>
-void matrix_dbg_print (const Matrix<T, m, n> &A) {
+void matrix_fancy_print (const Matrix<T, m, n> &A) {
   for (size_t i=0; i<m; i++){
     std::cout << "[";
     for (size_t j=0; j<n; j++){
