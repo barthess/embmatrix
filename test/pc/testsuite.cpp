@@ -4,6 +4,7 @@
 #include "matrix.hpp"
 #include "kalman.hpp"
 #include "matrix_osal_pc.cpp"
+#include "matrix_dbg.hpp"
 
 using namespace matrix;
 
@@ -50,6 +51,16 @@ float Kalman::run(void) {
 
 Kalman *kalman = new Kalman();
 
+static const unsigned int vert_array[15] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+
 int main(void){
   kalman->run();
+
+  Matrix<unsigned int, 5, 3> A(vert_array, sizeof(vert_array));
+  Matrix<unsigned int, 5, 3> B(vert_array, sizeof(vert_array));
+  Matrix<unsigned int, 3, 3> C;
+  matrix_fancy_print(A);
+  matrix_fancy_print(~A);
+  C = ~A * B;
+  matrix_fancy_print(C);
 }

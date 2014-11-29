@@ -38,7 +38,7 @@ void matrix_normalize(T *A, size_t len){
  * @brief     transpose matrix A(m x n) to B(n x m)
  */
 template <typename T>
-void matrix_real_transpose(size_t m, size_t n, const T *A, T *B){
+void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B){
   size_t i, j;
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
@@ -167,8 +167,14 @@ void matrix_multiply_TA(size_t m, size_t p, size_t n,
   for(i=0; i<m; i++) {     //each column in A
     for(j=0; j<n; j++) {   //each column in B
       tmp = 0;
-      for(k=0; k<p; k++)  //each element in column A & column B
-        tmp += A[k*p + i] * B[k*n + j];
+      for(k=0; k<p; k++){  //each element in column A & column B
+        size_t aidx = k*m + i;
+        size_t bidx = k*n + j;
+        tmp += A[aidx] * B[bidx];
+        std::cout << "[" << aidx << "," << bidx << "]" << "  ";
+        std::cout << A[aidx] << "," << B[bidx] << "  ";
+      }
+      std::cout << std::endl;
       //C[i*n + j] = tmp;
       *C++ = tmp;
     }

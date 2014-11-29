@@ -10,7 +10,7 @@ f = open("matrix_test.cpp", "w")
 
 CurrentTest = 0
 MAX_SIZE = 5
-RAND_PASSES = 5
+RAND_PASSES = 3
 
 def array_to_cpp(nparray):
     st = ""
@@ -34,11 +34,11 @@ def gen_samples_int_rand(m, p, n):
     c = c.reshape(m*n)
     return (a, b, c)
 
-def write_function(f, m, p, n, typename, gen_func):
+def write_function(f, m, p, n, typename, gen_samples_func):
     global CurrentTest
 
     print ("generate:", CurrentTest)
-    (a,b,c) = gen_func(m, p, n)
+    (a,b,c) = gen_samples_func(m, p, n)
 
     f.write("bool test" + str(CurrentTest) + "(void) {\n")
     f.write("  bool ret = false;\n")

@@ -14,7 +14,7 @@ class Matrix {
 
 public:
   T *M = nullptr;
-  bool _tr = false;
+  bool tr = false; /* transpose flag */
 
 public:
   ~Matrix(void) {
@@ -30,7 +30,7 @@ public:
   }
 
   /**
-   *
+   * @brief   Copy constructor. Keeps here commented out only for testing
    */
 //  Matrix(const Matrix3 &src){
 //    matrixDbgPrint("Matrix copy constructor\n");
@@ -38,22 +38,22 @@ public:
 //    memcpy(this->M, src.M, msize());
 //  }
 
-  Matrix(const Matrix&) = delete; //запретить копирование
-  void operator=(const Matrix&) = delete; //запретить присваивание
+  /**
+   * @brief   Coping forbidden
+   */
+  Matrix(const Matrix&) = delete;
 
   /**
-   *
+   * @brief   Assign forbidden
    */
-  bool transposed(void) {
-    return this->_tr;
-  }
+  void operator=(const Matrix&) = delete;
 
   /**
    *
    */
   Matrix(Matrix &&src) {
     matrixDbgPrint("Matrix move constructor\n");
-    _tr = src._tr;
+    tr = src.tr;
     M = src.M;
     src.M = nullptr;
   }
@@ -88,7 +88,7 @@ public:
       return *this;
     else{
       matrix_free(pool_index(), M);
-      _tr = src._tr;
+      tr = src.tr;
       M = src.M;
       src.M = nullptr;
       return *this;
@@ -208,12 +208,21 @@ template <typename T, int m, int n, int p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
                             const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
-  matrix_multiply(m, n, p, left.M, right.M, ret.M);
+
+  if (!left.tr && !right.tr)
+    matrix_multiply(m, n, p, left.M, right.M, ret.M);
+  else if (left.tr && !right.tr)
+    matrix_multiply_TA(m, n, p, left.M, right.M, ret.M);
+  else if (!left.tr && right.tr)
+    matrix_multiply_TB(m, n, p, left.M, right.M, ret.M);
+  else
+    matrix_multiply_TAB(m, n, p, left.M, right.M, ret.M);
+
   return ret;
 }
 
 /**
- * Multiply operator
+ * Multiply operator returning scalar type
  */
 template <typename T, int n>
 T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
@@ -222,27 +231,26 @@ T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
 
 /**
  * @brief Transpose operator
+ * @note  Performs full array copy
  */
-//template <typename T, int m, int n>
-//Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
-//  Matrix<T, n, m> ret;
-//  matrix_real_transpose(m, n, left.M, ret.M);
-//  return ret;
-//}
 template <typename T, int m, int n>
 Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
-  matrixDbgPrint("Matrix deep transpose\n");
+  matrixDbgPrint("Matrix copy transpose\n");
   Matrix<T, n, m> ret;
-  ret._tr = !left._tr;
+  ret.tr = !left.tr;
   memcpy(ret.M, left.M, ret.msize());
   return ret;
 }
 
+/**
+ * @brief Transpose operator
+ * @note  Uses move semantic without coping
+ */
 template <typename T, int m, int n>
 Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
-  matrixDbgPrint("Matrix shallow transpose\n");
+  matrixDbgPrint("Matrix move transpose\n");
   Matrix<T, n, m> ret(std::move(left));
-  ret._tr = !ret._tr;
+  ret.tr = !ret.tr;
   return ret;
 }
 

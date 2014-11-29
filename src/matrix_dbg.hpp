@@ -51,7 +51,7 @@ void matrix_fancy_print (const Matrix<T, m, n> &A) {
   for (size_t i=0; i<m; i++){
     std::cout << "[";
     for (size_t j=0; j<n; j++){
-      std::cout << A.M[i*m + j];
+      std::cout << A.M[i*n + j];
       if (j < n-1)
         std::cout << " ";
     }
