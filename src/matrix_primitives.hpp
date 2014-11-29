@@ -38,7 +38,7 @@ void matrix_normalize(T *A, size_t len){
  * @brief     transpose matrix A(m x n) to B(n x m)
  */
 template <typename T>
-void matrix_transpose(size_t m, size_t n, const T *A, T *B){
+void matrix_real_transpose(size_t m, size_t n, const T *A, T *B){
   size_t i, j;
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
@@ -123,6 +123,18 @@ void matrix_transpose(size_t m, size_t n, const T *A, T *B){
 //#else /* CORTEX_HAS_FPU */
 
 /**
+ * @brief   calculate vector dot-product  c = a . b
+ */
+template <typename T>
+T vector_multiply(const T *a, const T *b, size_t p) {
+  T S = 0;
+
+  while (p--)
+    S += *a++ * *b++;
+  return S;
+}
+
+/**
  * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
  */
 template <typename T>
@@ -136,7 +148,75 @@ void matrix_multiply(size_t m, size_t p, size_t n,
       tmp = 0;
       for(k=0; k<p; k++)  //each element in row A & column B
         tmp += A[i*p + k] * B[k*n + j];
-      C[i*n + j] = tmp;
+      //C[i*n + j] = tmp;
+      *C++ = tmp;
+    }
+  }
+}
+
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ * @note    matrix A transposed
+ */
+template <typename T>
+void matrix_multiply_TA(size_t m, size_t p, size_t n,
+                        const T *A, const T *B, T *C) {
+  size_t i, j, k;
+  T tmp;
+
+  for(i=0; i<m; i++) {     //each column in A
+    for(j=0; j<n; j++) {   //each column in B
+      tmp = 0;
+      for(k=0; k<p; k++)  //each element in column A & column B
+        tmp += A[k*p + i] * B[k*n + j];
+      //C[i*n + j] = tmp;
+      *C++ = tmp;
+    }
+  }
+}
+
+
+
+
+
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ * @note    matrix B transposed
+ */
+template <typename T>
+void matrix_multiply_TB(size_t m, size_t p, size_t n,
+                        const T *A, const T *B, T *C) {
+  size_t i, j, k;
+  T tmp;
+
+  for(i=0; i<m; i++) {     //each row in A
+    for(j=0; j<n; j++) {   //each column in B
+      tmp = 0;
+      for(k=0; k<p; k++)  //each element in row A & column B
+        tmp += A[i*p + k] * B[k*n + j];
+      //C[i*n + j] = tmp;
+      *C++ = tmp;
+    }
+  }
+}
+
+/**
+ * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
+ * @note    matrices A and B transposed
+ */
+template <typename T>
+void matrix_multiply_TAB(size_t m, size_t p, size_t n,
+                         const T *A, const T *B, T *C) {
+  size_t i, j, k;
+  T tmp;
+
+  for(i=0; i<m; i++) {     //each row in A
+    for(j=0; j<n; j++) {   //each column in B
+      tmp = 0;
+      for(k=0; k<p; k++)  //each element in row A & column B
+        tmp += A[i*p + k] * B[k*n + j];
+      //C[i*n + j] = tmp;
+      *C++ = tmp;
     }
   }
 }

@@ -3,6 +3,7 @@
 #include "string.h"
 #include "matrix.hpp"
 #include "kalman.hpp"
+#include "matrix_osal_pc.cpp"
 
 using namespace matrix;
 
@@ -30,15 +31,13 @@ Kalman::Kalman(void) :
 float Kalman::run(void) {
 
   Matrix<klmfp, 3, 3> Patch(0);
-
-  for(size_t i=0; i<5000; i++){
-    R = T * J * F * ~T;
+  std::cout << "-----\n";
+  for(size_t i=0; i<1; i++){
+    R = T * J * F * ~(T*T);
+    std::cout << "-----\n";
     R = R * F;
-    J = R + T;
-    patch(F, Patch, 3, 1);
-    patch(F, row(Patch, 0), 10, 11);
-    //RTtest = !J * ~Ttest;
-    RTtest = J * ~Ttest;
+    // J = R + T;
+    // RTtest = J * ~Ttest;
   }
 
   return 0;

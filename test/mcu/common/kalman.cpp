@@ -1,4 +1,3 @@
-#include "hal.h"
 #include "matrix.hpp"
 #include "matrix_mempool.hpp"
 
@@ -22,6 +21,7 @@ Kalman::Kalman(void) :
   return;
 }
 
+static klmfp scalar;
 
 float Kalman::run(void) {
 
@@ -29,16 +29,18 @@ float Kalman::run(void) {
 
   for(size_t i=0; i<100; i++){
     uint32_t start = chSysGetRealtimeCounterX();
-    R = T * J * F * ~T;
+    R = T * J * F * ~(T*T);
     R = R * F;
     J = R + T;
     patch(F, Patch, 3, 1);
     patch(F, row(Patch, 0), 10, 11);
     //RTtest = !J * ~Ttest;
     RTtest = J * ~Ttest;
+    scalar = Ttest * RTtest;
+
     matrix_total_time += chSysGetRealtimeCounterX() - start;
   }
-  chThdSleepMilliseconds(1); /* hack to enforce stack check by chibios */
+  chThdSleep(1); /* hack to enforce stack check by chibios */
 
   matrix_alloc_time = 0;
   matrix_free_time = 0;

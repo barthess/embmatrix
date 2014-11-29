@@ -1,4 +1,4 @@
-INC = -I../../include -I../mcu/common
+INC = -I../../osal -I../../src -I../mcu/common
 CC = g++
 CPPWARN = -Wall \
 		  -Wextra \

@@ -1,8 +1,10 @@
 #ifndef MATRIX_HPP_
 #define MATRIX_HPP_
 
+#include <utility> // for std::move
+#include <cstring> // memcpy, memset
+
 #include "matrix_osal.hpp"
-#include "string.h"
 #include "matrix_primitives.hpp"
 
 namespace matrix {
@@ -11,7 +13,8 @@ template<typename T, int r, int c>
 class Matrix {
 
 public:
-  T *M;
+  T *M = nullptr;
+  bool _tr = false;
 
 public:
   ~Matrix(void) {
@@ -41,10 +44,18 @@ public:
   /**
    *
    */
-  Matrix(Matrix &&src){
+  bool transposed(void) {
+    return this->_tr;
+  }
+
+  /**
+   *
+   */
+  Matrix(Matrix &&src) {
     matrixDbgPrint("Matrix move constructor\n");
+    _tr = src._tr;
     M = src.M;
-    src.M = NULL;
+    src.M = nullptr;
   }
 
   /**
@@ -70,15 +81,16 @@ public:
   /**
    * @brief Move operator
    */
-  Matrix& operator=(Matrix &&src){
+  Matrix& operator=(Matrix &&src) {
     matrixDbgPrint("Matrix move operator\n");
 
     if (this == &src)
       return *this;
     else{
       matrix_free(pool_index(), M);
+      _tr = src._tr;
       M = src.M;
-      src.M = NULL;
+      src.M = nullptr;
       return *this;
     }
   }
@@ -128,7 +140,7 @@ public:
    * @param c
    * @return pointer to the element.
    */
-  T& operator() (const size_t row, const size_t col){
+  T& operator() (const size_t row, const size_t col) {
     return this->M[calc_subindex(row,col)];
   }
 
@@ -138,19 +150,18 @@ public:
    * @param c
    * @return the element.
    */
-  T operator() (size_t row, size_t col) const{
+  T operator() (size_t row, size_t col) const {
     return this->M[calc_subindex(row, col)];
   }
-
-private:
 
   /**
    * @brief Return matrix size in bytes
    */
-  constexpr size_t msize(void){
+  constexpr size_t msize(void) {
     return sizeof(T) * r * c;
   }
 
+private:
   /**
    * @brief Determine closest suitable pool size
    */
@@ -194,19 +205,44 @@ private:
  * Multiply operator
  */
 template <typename T, int m, int n, int p>
-Matrix<T, m, p> operator * (const Matrix<T, m, n> &left, const Matrix<T, n, p> &right) {
+Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
+                            const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
   matrix_multiply(m, n, p, left.M, right.M, ret.M);
   return ret;
 }
 
 /**
+ * Multiply operator
+ */
+template <typename T, int n>
+T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
+  return vector_multiply(left.M, right.M, n);
+}
+
+/**
  * @brief Transpose operator
  */
+//template <typename T, int m, int n>
+//Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
+//  Matrix<T, n, m> ret;
+//  matrix_real_transpose(m, n, left.M, ret.M);
+//  return ret;
+//}
 template <typename T, int m, int n>
 Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
+  matrixDbgPrint("Matrix deep transpose\n");
   Matrix<T, n, m> ret;
-  matrix_transpose(m, n, left.M, ret.M);
+  ret._tr = !left._tr;
+  memcpy(ret.M, left.M, ret.msize());
+  return ret;
+}
+
+template <typename T, int m, int n>
+Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
+  matrixDbgPrint("Matrix shallow transpose\n");
+  Matrix<T, n, m> ret(std::move(left));
+  ret._tr = !ret._tr;
   return ret;
 }
 
@@ -229,7 +265,7 @@ void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
  *
  */
 template <typename T, int r, int c>
-Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row){
+Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row) {
   matrixDbgCheck(row < c);
 
   Matrix<T, 1, c> ret;
