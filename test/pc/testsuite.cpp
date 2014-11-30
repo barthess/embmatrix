@@ -60,7 +60,6 @@ int main(void){
   Matrix<unsigned int, 2, 5> B(vert_array, sizeof(vert_array));
   Matrix<unsigned int, 2, 2> C;
   std::cout << "-----\n";
-  //B = ~A;
   C = ~A * ~B;
   matrix_fancy_print(C);
 }

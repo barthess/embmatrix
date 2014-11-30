@@ -110,16 +110,25 @@ bool operator != (const Matrix<double, m, n> &A,
  */
 template <typename T, size_t m, size_t n>
 void matrix_fancy_print (const Matrix<T, m, n> &A) {
-  for (size_t i=0; i<m; i++){
-    std::cout << "[";
-    for (size_t j=0; j<n; j++){
-      std::cout << A.M[i*n + j];
-      if (j < n-1)
-        std::cout << " ";
-    }
-    std::cout << "]\n";
+
+  if (A.tr) {
+    /* little cheat for transposed matrix */
+    Matrix<T, m, n> B;
+    matrix_deep_transpose(n, m, A.M, B.M);
+    matrix_fancy_print(B);
   }
-  std::cout << "\n";
+  else {
+    for (size_t i=0; i<m; i++){
+      std::cout << "[";
+      for (size_t j=0; j<n; j++){
+        std::cout << A.M[i*n + j];
+        if (j < n-1)
+          std::cout << " ";
+      }
+      std::cout << "]\n";
+    }
+    std::cout << "\n";
+  }
 }
 
 } /* namespace matrix */
