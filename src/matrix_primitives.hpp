@@ -19,6 +19,7 @@ namespace matrix {
 template <typename T>
 T matrix_modulus(const T *A, size_t len){
   T R = 0;
+
   while(len--)
     R += *A * *A++;
   return sqrt(R);
@@ -40,6 +41,7 @@ void matrix_normalize(T *A, size_t len){
 template <typename T>
 void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B){
   size_t i, j;
+
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
       B[j*m + i] = A[i*n + j];

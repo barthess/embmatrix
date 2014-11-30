@@ -101,6 +101,8 @@ public:
   Matrix& operator ! (void){
     matrixDbgPrint("Matrix inverse operator\n");
     static_assert(c == r, "matrix must be square");
+     /* current realization can not inverse transposed matrices */
+    matrixDbgCheck(false == tr);
 
     /* The function returns 1 on success, 0 on failure. */
     int inv_res = matrix_inverse(c, M);
