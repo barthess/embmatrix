@@ -19,8 +19,8 @@ namespace matrix {
 template <typename T>
 T matrix_modulus(const T *A, size_t len){
   T R = 0;
-  for (size_t i=0; i<len; i++)
-    R += A[i] * A[i];
+  while(len--)
+    R += *A * *A++;
   return sqrt(R);
 }
 
@@ -30,8 +30,8 @@ T matrix_modulus(const T *A, size_t len){
 template <typename T>
 void matrix_normalize(T *A, size_t len){
   T R = 1 / matrix_modulus(A, len);
-  for (size_t i=0; i<len; i++)
-    A[i] *= R;
+  while(len--)
+    *A++ *= R;
 }
 
 /**
@@ -164,26 +164,16 @@ void matrix_multiply_TA(size_t m, size_t p, size_t n,
   size_t i, j, k;
   T tmp;
 
-  for(i=0; i<m; i++) {     //each column in A
-    for(j=0; j<n; j++) {   //each column in B
+  for(i=0; i<m; i++) {
+    for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++){  //each element in column A & column B
-        size_t aidx = k*m + i;
-        size_t bidx = k*n + j;
-        tmp += A[aidx] * B[bidx];
-        std::cout << "[" << aidx << "," << bidx << "]" << "  ";
-        std::cout << A[aidx] << "," << B[bidx] << "  ";
+      for(k=0; k<p; k++) {
+        tmp += A[k*m + i] * B[k*n + j];
       }
-      std::cout << std::endl;
-      //C[i*n + j] = tmp;
       *C++ = tmp;
     }
   }
 }
-
-
-
-
 
 /**
  * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
@@ -195,12 +185,12 @@ void matrix_multiply_TB(size_t m, size_t p, size_t n,
   size_t i, j, k;
   T tmp;
 
-  for(i=0; i<m; i++) {     //each row in A
-    for(j=0; j<n; j++) {   //each column in B
+  for(i=0; i<m; i++) {
+    for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++)  //each element in row A & column B
-        tmp += A[i*p + k] * B[k*n + j];
-      //C[i*n + j] = tmp;
+      for(k=0; k<p; k++) {
+        tmp += A[i*p + k] * B[p*j + k];
+      }
       *C++ = tmp;
     }
   }
@@ -216,12 +206,12 @@ void matrix_multiply_TAB(size_t m, size_t p, size_t n,
   size_t i, j, k;
   T tmp;
 
-  for(i=0; i<m; i++) {     //each row in A
-    for(j=0; j<n; j++) {   //each column in B
+  for(i=0; i<m; i++) {
+    for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++)  //each element in row A & column B
-        tmp += A[i*p + k] * B[k*n + j];
-      //C[i*n + j] = tmp;
+      for(k=0; k<p; k++) {
+        tmp += A[k*m + i] * B[p*j + k];
+      }
       *C++ = tmp;
     }
   }
