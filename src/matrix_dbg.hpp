@@ -16,7 +16,7 @@ static const double EQUAL_D = 0.0001;
 /**
  *
  */
-template <int m, int n>
+template <size_t m, size_t n>
 bool operator == (const Matrix<unsigned int, m, n> &A,
                   const Matrix<unsigned int, m, n> &B) {
   size_t i = n * m;
@@ -30,7 +30,7 @@ bool operator == (const Matrix<unsigned int, m, n> &A,
 /**
  *
  */
-template <int m, int n>
+template <size_t m, size_t n>
 bool operator == (const Matrix<int, m, n> &A,
                   const Matrix<int, m, n> &B) {
   size_t i = n * m;
@@ -44,7 +44,7 @@ bool operator == (const Matrix<int, m, n> &A,
 /**
  *
  */
-template <int m, int n>
+template <size_t m, size_t n>
 bool operator == (const Matrix<float, m, n> &A,
                   const Matrix<float, m, n> &B) {
   size_t i = n * m;
@@ -58,7 +58,7 @@ bool operator == (const Matrix<float, m, n> &A,
 /**
  *
  */
-template <int m, int n>
+template <size_t m, size_t n>
 bool operator == (const Matrix<double, m, n> &A,
                   const Matrix<double, m, n> &B) {
   size_t i = n * m;
@@ -72,23 +72,43 @@ bool operator == (const Matrix<double, m, n> &A,
 /**
  *
  */
-template <int m, int n>
-bool operator != (const Matrix<unsigned int, m, n> &A, const Matrix<unsigned int, m, n> &B) {
+template <size_t m, size_t n>
+bool operator != (const Matrix<unsigned int, m, n> &A,
+                  const Matrix<unsigned int, m, n> &B) {
   return !(A == B);
 }
 
 /**
  *
  */
-template <int m, int n>
-bool operator != (const Matrix<int, m, n> &A, const Matrix<int, m, n> &B) {
+template <size_t m, size_t n>
+bool operator != (const Matrix<int, m, n> &A,
+                  const Matrix<int, m, n> &B) {
   return !(A == B);
 }
 
 /**
  *
  */
-template <typename T, int m, int n>
+template <size_t m, size_t n>
+bool operator != (const Matrix<float, m, n> &A,
+                  const Matrix<float, m, n> &B) {
+  return !(A == B);
+}
+
+/**
+ *
+ */
+template <size_t m, size_t n>
+bool operator != (const Matrix<double, m, n> &A,
+                  const Matrix<double, m, n> &B) {
+  return !(A == B);
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
 void matrix_fancy_print (const Matrix<T, m, n> &A) {
   for (size_t i=0; i<m; i++){
     std::cout << "[";

@@ -9,7 +9,7 @@
 
 namespace matrix {
 
-template<typename T, int r, int c>
+template<typename T, size_t r, size_t c>
 class Matrix {
 
 public:
@@ -39,7 +39,7 @@ public:
 //  }
 
   /**
-   * @brief   Coping forbidden
+   * @brief   Copy forbidden
    */
   Matrix(const Matrix&) = delete;
 
@@ -65,7 +65,7 @@ public:
     matrixDbgPrint("Matrix pattern constructor\n");
     _default_ctor();
     for (size_t i=0; i<(c*r); i++)
-      this->M[i] = pattern;
+      M[i] = pattern;
   }
 
   /**
@@ -75,7 +75,7 @@ public:
     matrixDbgPrint("Matrix const array constructor\n");
     matrixDbgCheck(msize() == arraysize); /* sizes mismatch */
     _default_ctor();
-    memcpy(this->M, array, arraysize);
+    memcpy(M, array, arraysize);
   }
 
   /**
@@ -118,7 +118,7 @@ public:
     Matrix<T, r, c> ret;
 
     for (size_t i=0; i<(r*c); i++){
-      ret.M[i] = this->M[i] + S.M[i];
+      ret.M[i] = M[i] + S.M[i];
     }
     return ret;
   }
@@ -131,7 +131,7 @@ public:
     Matrix<T, r, c> ret;
 
     for (size_t i=0; i<(r*c); i++){
-      ret.M[i] = this->M[i] - S.M[i];
+      ret.M[i] = M[i] - S.M[i];
     }
     return ret;
   }
@@ -142,8 +142,8 @@ public:
    * @param c
    * @return pointer to the element.
    */
-  T& operator() (const size_t row, const size_t col) {
-    return this->M[calc_subindex(row,col)];
+  T& operator() (size_t row, size_t col) {
+    return M[calc_subindex(row, col)];
   }
 
   /**
@@ -153,7 +153,7 @@ public:
    * @return the element.
    */
   T operator() (size_t row, size_t col) const {
-    return this->M[calc_subindex(row, col)];
+    return M[calc_subindex(row, col)];
   }
 
   /**
@@ -206,7 +206,7 @@ private:
 /**
  * Multiply operator
  */
-template <typename T, int m, int n, int p>
+template <typename T, size_t m, size_t n, size_t p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
                             const Matrix<T, n, p> &right) {
   Matrix<T, m, p> ret;
@@ -226,7 +226,7 @@ Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
 /**
  * Multiply operator returning scalar type
  */
-template <typename T, int n>
+template <typename T, size_t n>
 T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
   return vector_multiply(left.M, right.M, n);
 }
@@ -235,7 +235,7 @@ T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
  * @brief Transpose operator
  * @note  Performs full array copy
  */
-template <typename T, int m, int n>
+template <typename T, size_t m, size_t n>
 Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
   matrixDbgPrint("Matrix copy transpose\n");
   Matrix<T, n, m> ret;
@@ -246,9 +246,9 @@ Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
 
 /**
  * @brief Transpose operator
- * @note  Uses move semantic without coping
+ * @note  Uses move semantic
  */
-template <typename T, int m, int n>
+template <typename T, size_t m, size_t n>
 Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
   matrixDbgPrint("Matrix move transpose\n");
   Matrix<T, n, m> ret(std::move(left));
@@ -259,7 +259,7 @@ Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
 /**
  *
  */
-template <typename T, int m, int n, int p, int q>
+template <typename T, size_t m, size_t n, size_t p, size_t q>
 void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
                                                 size_t row, size_t col) {
   matrixDbgCheck((row + p) <= m && (col + q) <= n);
@@ -274,7 +274,7 @@ void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
 /**
  *
  */
-template <typename T, int r, int c>
+template <typename T, size_t r, size_t c>
 Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row) {
   matrixDbgCheck(row < c);
 
