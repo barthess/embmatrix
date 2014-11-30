@@ -34,9 +34,9 @@ float Kalman::run(void) {
   Matrix<klmfp, 3, 3> Patch(0);
   std::cout << "-----\n";
   for(size_t i=0; i<1; i++){
-    R = T * J * F * ~(T*T);
-    std::cout << "-----\n";
-    R = R * F;
+    //R = T * J * F * ~(T*T);
+    //std::cout << "-----\n";
+    //R = R * F;
     // J = R + T;
     // RTtest = J * ~Ttest;
   }
@@ -51,16 +51,16 @@ float Kalman::run(void) {
 
 Kalman *kalman = new Kalman();
 
-static const unsigned int vert_array[15] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+static const unsigned int vert_array[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 int main(void){
   kalman->run();
 
-  Matrix<unsigned int, 5, 3> A(vert_array, sizeof(vert_array));
-  Matrix<unsigned int, 5, 3> B(vert_array, sizeof(vert_array));
-  Matrix<unsigned int, 3, 3> C;
-  matrix_fancy_print(A);
-  matrix_fancy_print(~A);
-  C = ~A * B;
+  Matrix<unsigned int, 5, 2> A(vert_array, sizeof(vert_array));
+  Matrix<unsigned int, 2, 5> B(vert_array, sizeof(vert_array));
+  Matrix<unsigned int, 2, 2> C;
+  std::cout << "-----\n";
+  //B = ~A;
+  C = ~A * ~B;
   matrix_fancy_print(C);
 }
