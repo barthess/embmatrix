@@ -10,7 +10,7 @@ CPPWARN = -Wall \
 		  -Wold-style-cast \
 		  -Wnon-virtual-dtor 
 
-CFLAGS = -O0 -ggdb -std=gnu++11
+CFLAGS = -O0 -std=gnu++11
 CPPFLAGS = $(CFLAGS) $(CPPWARN) $(INC)
 
 DEPS = ../../src/* ../../osal/*
