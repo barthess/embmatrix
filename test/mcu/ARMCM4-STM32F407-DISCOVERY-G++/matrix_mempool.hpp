@@ -1,5 +1,5 @@
-#ifndef MATRIX_MEMPOOL_HPP_
-#define MATRIX_MEMPOOL_HPP_
+#ifndef EMBMATRIX_DISCOVERY_MATRIX_MEMPOOL_HPP_
+#define EMBMATRIX_DISCOVERY_MATRIX_MEMPOOL_HPP_
 
 #include "hal.h"
 
@@ -12,4 +12,4 @@ extern memory_pool_t pool_array[MATRIX_MEMPOOL_LEN];
 
 void matrixMempoolStart(void);
 
-#endif /* MATRIX_MEMPOOL_HPP_ */
+#endif /* EMBMATRIX_DISCOVERY_MATRIX_MEMPOOL_HPP_ */

@@ -30,23 +30,22 @@ public:
   }
 
   /**
-   * @brief   Copy constructor. Keeps here commented out only for testing
+   * @brief   Copy constructor. Keep it for testing
    */
-//  Matrix(const Matrix3 &src){
-//    matrixDbgPrint("Matrix copy constructor\n");
-//    _default_ctor();
-//    memcpy(this->M, src.M, msize());
-//  }
+#if defined(MATRIX_COPY_CTOR_ENABLED)
+  Matrix(const Matrix &src){
+    matrixDbgPrint("Matrix copy constructor\n");
+    _default_ctor();
+    memcpy(this->M, src.M, msize());
+  }
+#else
+  Matrix(const Matrix &src) = delete; /* Copy forbidden */
+#endif /* MATRIX_COPY_CTOR_FORBIDDEN */
 
   /**
-   * @brief   Copy forbidden
+   * @brief
    */
-  Matrix(const Matrix&) = delete;
-
-  /**
-   * @brief   Assign forbidden
-   */
-  void operator=(const Matrix&) = delete;
+  void operator=(const Matrix &src) = delete; /* Assign forbidden */
 
   /**
    *
@@ -66,6 +65,16 @@ public:
     _default_ctor();
     for (size_t i=0; i<(c*r); i++)
       M[i] = pattern;
+  }
+
+  /**
+   *
+   */
+  Matrix(T pattern, T diag): Matrix(pattern) {
+    matrixDbgPrint("Matrix diag constructor\n");
+    size_t diagSize = (c > r)? r : c;
+    for(size_t i = 0; i < diagSize; i++)
+      this->M[i*c + i] = diag;
   }
 
   /**
@@ -98,7 +107,7 @@ public:
   /**
    * @brief Inverse operator
    */
-  Matrix& operator ! (void){
+  Matrix& operator ! (void) {
     matrixDbgPrint("Matrix inverse operator\n");
     static_assert(c == r, "matrix must be square");
      /* current realization can not inverse transposed matrices */
@@ -113,27 +122,90 @@ public:
   /**
    * @note    here is no need to check sizes at run time
    */
-  Matrix operator + (const Matrix &S) const {
+  Matrix operator + (const Matrix &right) const {
     matrixDbgPrint("Matrix + operator\n");
     Matrix<T, r, c> ret;
 
-    for (size_t i=0; i<(r*c); i++){
-      ret.M[i] = M[i] + S.M[i];
-    }
+    if (!this->tr && !right.tr)
+      matrix_add(r*c, this->M, right.M, ret.M);
+    else if (this->tr && !right.tr)
+      matrix_add_TA(r, c, this->M, right.M, ret.M);
+    else if (!this->tr && right.tr)
+      matrix_add_TB(r, c, this->M, right.M, ret.M);
+    else
+      matrix_add_TAB(r, c, this->M, right.M, ret.M);
+
     return ret;
+  }
+
+  /**
+   *
+   */
+  void operator += (const Matrix &right) {
+    matrixDbgPrint("Matrix += operator\n");
+
+    if (!this->tr && !right.tr)
+      matrix_add_equal(r*c, right.M, this->M);
+    else if (this->tr && !right.tr)
+      matrix_add_equal_TA(r, c, right.M, this->M);
+    else if (!this->tr && right.tr)
+      matrix_add_equal_TB(r, c, right.M, this->M);
+    else
+      matrix_add_equal_TAB(r, c, right.M, this->M);
   }
 
   /**
    * @note    here is no need to check sizes at run time
    */
-  Matrix operator - (const Matrix &S) const {
+  Matrix operator - (const Matrix &right) const {
     matrixDbgPrint("Matrix - operator\n");
     Matrix<T, r, c> ret;
 
-    for (size_t i=0; i<(r*c); i++){
-      ret.M[i] = M[i] - S.M[i];
-    }
+    if (!this->tr && !right.tr)
+      matrix_substract(r*c, this->M, right.M, ret.M);
+    else if (this->tr && !right.tr)
+      matrix_substract_TA(r, c, this->M, right.M, ret.M);
+    else if (!this->tr && right.tr)
+      matrix_substract_TB(r, c, this->M, right.M, ret.M);
+    else
+      matrix_substract_TAB(r, c, this->M, right.M, ret.M);
+
     return ret;
+  }
+
+  /**
+   *
+   */
+  void operator -= (const Matrix &right) {
+    matrixDbgPrint("Matrix -= operator\n");
+
+    if (!this->tr && !right.tr)
+      matrix_substract_equal(r*c, right.M, this->M);
+    else if (this->tr && !right.tr)
+      matrix_substract_equal_TA(r, c, right.M, this->M);
+    else if (!this->tr && right.tr)
+      matrix_substract_equal_TB(r, c, right.M, this->M);
+    else
+      matrix_substract_equal_TAB(r, c, right.M, this->M);
+  }
+
+  /**
+   *
+   */
+  void operator *= (T scale) {
+    matrixDbgPrint("Matrix *= operator\n");
+    for (size_t i=0; i<r*c; i++)
+      this->M[i] *= scale;
+  }
+
+  /**
+   *
+   */
+  void operator /= (T scale) {
+    matrixDbgPrint("Matrix /= operator\n");
+    scale = static_cast<T>(1) / scale;
+    for (size_t i=0; i<r*c; i++)
+      this->M[i] *= scale;
   }
 
   /**
@@ -204,7 +276,7 @@ private:
 };
 
 /**
- * Multiply operator
+ * Multiplication operator
  */
 template <typename T, size_t m, size_t n, size_t p>
 Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
@@ -224,6 +296,27 @@ Matrix<T, m, p> operator * (const Matrix<T, m, n> &left,
 }
 
 /**
+ * Scale operator
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator * (const Matrix<T, m, n> &left, T scale) {
+  Matrix<T, m, n> ret;
+  matrix_scale(ret.M, left.M, scale, m*n);
+  return ret;
+}
+
+/**
+ * Overloaded scale operator (r-value)
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator * (Matrix<T, m, n> &&left, T scale) {
+  Matrix<T, m, n> ret(std::move(left));
+  for (size_t i = 0; i < m*n; i++)
+    ret.M[i] *= scale;
+  return ret;
+}
+
+/**
  * Multiply operator returning scalar type
  */
 template <typename T, size_t n>
@@ -232,8 +325,40 @@ T operator * (const Matrix<T, 1, n> &left, const Matrix<T, n, 1> &right) {
 }
 
 /**
+ * Overloaded scale operator for reverse operand order
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator * (T scale, const Matrix<T, m, n> &right) {
+  return right * scale;
+}
+
+/**
+ * Overloaded scale operator for reverse operand order (r-value)
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator * (T scale, Matrix<T, m, n> &&right) {
+  return std::move(right) * scale;
+}
+
+/**
+ * Scale (division) operator
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator / (const Matrix<T, m, n> &left, T scale) {
+  return left * (static_cast<T>(1) / scale);
+}
+
+/**
+ * Overloaded scale (division) operator (r-value)
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator / (Matrix<T, m, n> &&left, T scale) {
+  return std::move(left) * (static_cast<T>(1.0) / scale);
+}
+
+/**
  * @brief Transpose operator
- * @note  Performs full array copy
+ * @note  Performs deep array copy
  */
 template <typename T, size_t m, size_t n>
 Matrix<T, n, m> operator ~ (const Matrix<T, m, n> &left) {
@@ -282,6 +407,40 @@ Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row) {
   T *M = &donor.M[row*c];
   memcpy(ret.M, M, sizeof(T) * c);
   return ret;
+}
+
+/**
+ * @brief Matrix norm
+ */
+template <typename T, size_t r, size_t c>
+T norm(const Matrix<T, r, c> &matr) {
+  return matrix_modulus(matr.M, r*c);
+}
+
+/**
+ * @brief Matrix square root
+ */
+template <typename T, size_t size>
+Matrix<T, size, size> sqrtm(const Matrix<T, size, size> &matr,
+                            const size_t maxIter = 50,
+                            const T epsilon = 1e-5) {
+  matrixDbgPrint("Matrix square root\n");
+
+  Matrix<T, size, size> tmp(0, 1);
+  Matrix<T, size, size> result(matr), currentSqrtm, copyResult, copyTmp;
+  T normDelta;
+
+  for (size_t i = 0; i < maxIter; i++) {
+    copyResult = result;
+    copyTmp = tmp;
+    currentSqrtm = (result + !copyTmp) * static_cast<T>(0.5);
+    tmp = (tmp + !copyResult) * static_cast<T>(0.5);
+    normDelta = matrix_modulus((result - currentSqrtm).M, size*size);
+    result = currentSqrtm;
+    if (normDelta < epsilon)
+      return result;
+  }
+  return result;
 }
 
 } /* namespace matrix */

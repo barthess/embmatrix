@@ -19,7 +19,6 @@ namespace matrix {
 template <typename T>
 T matrix_modulus(const T *A, size_t len){
   T R = 0;
-
   while(len--)
     R += *A * *A++;
   return sqrt(R);
@@ -47,7 +46,6 @@ void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B){
       B[j*m + i] = A[i*n + j];
 }
 
-//#if CORTEX_HAS_FPU
 ///**
 // * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
 // * @note    Faster variant developing for using MAC instructions from
@@ -122,7 +120,6 @@ void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B){
 //    }
 //  }
 //}
-//#else /* CORTEX_HAS_FPU */
 
 /**
  * @brief   calculate vector dot-product  c = a . b
@@ -130,10 +127,18 @@ void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B){
 template <typename T>
 T vector_multiply(const T *a, const T *b, size_t p) {
   T S = 0;
-
   while (p--)
     S += *a++ * *b++;
   return S;
+}
+
+/**
+ * @brief   calcuate scalar-product  B = s x A
+ */
+template <typename T>
+void matrix_scale(T *B, const T *A, T s, size_t len) {
+  while (len--)
+    *B++ = *A++ * s;
 }
 
 /**
@@ -169,9 +174,8 @@ void matrix_multiply_TA(size_t m, size_t p, size_t n,
   for(i=0; i<m; i++) {
     for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++) {
+      for(k=0; k<p; k++)
         tmp += A[k*m + i] * B[k*n + j];
-      }
       *C++ = tmp;
     }
   }
@@ -190,9 +194,8 @@ void matrix_multiply_TB(size_t m, size_t p, size_t n,
   for(i=0; i<m; i++) {
     for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++) {
+      for(k=0; k<p; k++)
         tmp += A[i*p + k] * B[p*j + k];
-      }
       *C++ = tmp;
     }
   }
@@ -211,15 +214,168 @@ void matrix_multiply_TAB(size_t m, size_t p, size_t n,
   for(i=0; i<m; i++) {
     for(j=0; j<n; j++) {
       tmp = 0;
-      for(k=0; k<p; k++) {
+      for(k=0; k<p; k++)
         tmp += A[k*m + i] * B[p*j + k];
-      }
       *C++ = tmp;
     }
   }
 }
 
-//#endif /* CORTEX_HAS_FPU */
+/**
+ * @brief     C[m x n] = A[m x n] + B[m x n];
+ */
+template <typename T>
+void matrix_add(const size_t len, const T *A, const T *B, T *C) {
+  for (size_t i=0; i<len; i++)
+    C[i] = A[i] + B[i];
+}
+
+/**
+ * @brief     C[m x n] = A[n x m] + B[m x n];
+ */
+template <typename T>
+void matrix_add_TA(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = A[j + i*n] + *B++;
+}
+
+/**
+ * @brief     C[m x n] = A[m x n] + B[n x m];
+ */
+template <typename T>
+void matrix_add_TB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = *A++ + B[j + i*n];
+}
+
+/**
+ * @brief     C[m x n] = A[n x m] + B[n x m];
+ */
+template <typename T>
+void matrix_add_TAB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = A[j + i*n] + B[j + i*n];
+}
+
+/**
+ * @brief     C[m x n] = A[m x n] - B[m x n];
+ */
+template <typename T>
+void matrix_substract(const size_t len, const T *A, const T *B, T *C) {
+  for (size_t i=0; i<len; i++)
+    C[i] = A[i] - B[i];
+}
+
+/**
+ * @brief     C[m x n] = A[n x m] - B[m x n];
+ */
+template <typename T>
+void matrix_substract_TA(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = A[j + i*n] - *B++;
+}
+
+/**
+ * @brief     C[m x n] = A[m x n] - B[n x m];
+ */
+template <typename T>
+void matrix_substract_TB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = *A++ - B[j + i*n];
+}
+
+/**
+ * @brief     C[m x n] = A[n x m] - B[n x m];
+ */
+template <typename T>
+void matrix_substract_TAB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *C++ = A[j + i*n] - B[j + i*n];
+}
+
+/**
+ * @brief     B[m x n] += A[m x n];
+ */
+template <typename T>
+void matrix_add_equal (const size_t len, const T *A, T *B) {
+  for (size_t i=0; i<len; i++)
+    B[i] += A[i];
+}
+
+/**
+ * @brief     B[m x n] += A[n x m];
+ */
+template <typename T>
+void matrix_add_equal_TA(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *B++ += A[j + i*n];
+}
+
+/**
+ * @brief     B[n x m] += A[m x n];
+ */
+template <typename T>
+void matrix_add_equal_TB(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      B[j + i*n] += *A++;
+}
+
+/**
+ * @brief     B[n x m] += A[n x m];
+ */
+template <typename T>
+void matrix_add_equal_TAB(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      B[j + i*n] += A[j + i*n];
+}
+
+/**
+ * @brief     B[m x n] -= A[m x n];
+ */
+template <typename T>
+void matrix_substract_equal (const size_t len, const T *A, T *B) {
+  for (size_t i=0; i<len; i++)
+    B[i] -= A[i];
+}
+
+/**
+ * @brief     B[m x n] -= A[n x m];
+ */
+template <typename T>
+void matrix_substract_equal_TA(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      *B++ -= A[j + i*n];
+}
+
+/**
+ * @brief     B[n x m] -= A[m x n];
+ */
+template <typename T>
+void matrix_substract_equal_TB(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      B[j + i*n] -= *A++;
+}
+
+/**
+ * @brief     B[n x m] -= A[n x m];
+ */
+template <typename T>
+void matrix_substract_equal_TAB(const size_t m, const size_t n, const T *A, T *B) {
+  for (size_t j=0; j<n; j++)
+    for (size_t i=0; i<m; i++)
+      B[j + i*n] -= A[j + i*n];
+}
 
 // Matrix Inversion Routine from http://www.arduino.cc/playground/Code/MatrixMath
 // * This function inverts a matrix based on the Gauss Jordan method.
