@@ -235,9 +235,9 @@ void matrix_add(const size_t len, const T *A, const T *B, T *C) {
  */
 template <typename T>
 void matrix_add_TA(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = A[j + i*n] + *B++;
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = A[i + j*m] + *B++;
 }
 
 /**
@@ -245,9 +245,9 @@ void matrix_add_TA(const size_t m, const size_t n, const T *A, const T *B, T *C)
  */
 template <typename T>
 void matrix_add_TB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = *A++ + B[j + i*n];
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = *A++ + B[i + j*m];
 }
 
 /**
@@ -255,9 +255,9 @@ void matrix_add_TB(const size_t m, const size_t n, const T *A, const T *B, T *C)
  */
 template <typename T>
 void matrix_add_TAB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = A[j + i*n] + B[j + i*n];
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = A[i + j*m] + B[i + j*m];
 }
 
 /**
@@ -274,9 +274,9 @@ void matrix_substract(const size_t len, const T *A, const T *B, T *C) {
  */
 template <typename T>
 void matrix_substract_TA(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = A[j + i*n] - *B++;
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = A[i + j*m] - *B++;
 }
 
 /**
@@ -284,9 +284,9 @@ void matrix_substract_TA(const size_t m, const size_t n, const T *A, const T *B,
  */
 template <typename T>
 void matrix_substract_TB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = *A++ - B[j + i*n];
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = *A++ - B[i + j*m];
 }
 
 /**
@@ -294,10 +294,16 @@ void matrix_substract_TB(const size_t m, const size_t n, const T *A, const T *B,
  */
 template <typename T>
 void matrix_substract_TAB(const size_t m, const size_t n, const T *A, const T *B, T *C) {
-  for (size_t j=0; j<n; j++)
-    for (size_t i=0; i<m; i++)
-      *C++ = A[j + i*n] - B[j + i*n];
+  for (size_t i=0; i<m; i++)
+    for (size_t j=0; j<n; j++)
+      *C++ = A[i + j*m] - B[i + j*m];
 }
+
+
+
+
+
+
 
 /**
  * @brief     B[m x n] += A[m x n];
