@@ -45,7 +45,7 @@ public:
   /**
    * @brief
    */
-  void operator=(const Matrix &src) = delete; /* Assign forbidden */
+  void operator = (const Matrix &src) = delete; /* Assign forbidden */
 
   /**
    *
@@ -90,7 +90,7 @@ public:
   /**
    * @brief Move operator
    */
-  Matrix& operator=(Matrix &&src) {
+  Matrix& operator = (Matrix &&src) {
     matrixDbgPrint("Matrix move operator\n");
 
     if (this == &src)
@@ -386,7 +386,7 @@ Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
  */
 template <typename T, size_t m, size_t n, size_t p, size_t q>
 void patch(Matrix<T, m, n> &acceptor, const Matrix<T, p, q> &patch,
-                                                size_t row, size_t col) {
+                                         size_t row, size_t col) {
   matrixDbgCheck((row + p) <= m && (col + q) <= n);
   T *ap, *pp;
   for (size_t i = 0; i<p; i++){
@@ -413,21 +413,21 @@ Matrix<T, 1, c> row(const Matrix<T, r, c> &donor, size_t row) {
  * @brief Matrix norm
  */
 template <typename T, size_t r, size_t c>
-T norm(const Matrix<T, r, c> &matr) {
-  return matrix_modulus(matr.M, r*c);
+T norm(const Matrix<T, r, c> &mtrx) {
+  return matrix_modulus(mtrx.M, r*c);
 }
 
 /**
  * @brief Matrix square root
  */
 template <typename T, size_t size>
-Matrix<T, size, size> sqrtm(const Matrix<T, size, size> &matr,
+Matrix<T, size, size> sqrtm(const Matrix<T, size, size> &mtrx,
                             const size_t maxIter = 50,
                             const T epsilon = 1e-5) {
   matrixDbgPrint("Matrix square root\n");
 
   Matrix<T, size, size> tmp(0, 1);
-  Matrix<T, size, size> result(matr), currentSqrtm, copyResult, copyTmp;
+  Matrix<T, size, size> result(mtrx), currentSqrtm, copyResult, copyTmp;
   T normDelta;
 
   for (size_t i = 0; i < maxIter; i++) {
