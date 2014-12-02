@@ -10,8 +10,8 @@
 
 namespace matrix {
 
-static const float EQUAL_F = 0.0001;
-static const double EQUAL_D = 0.0001;
+static const float EPSILON_F = 0.001;
+static const double EPSILON_D = 0.001;
 
 /**
  *
@@ -50,7 +50,7 @@ bool operator == (const Matrix<float, m, n> &A,
   size_t i = n * m;
 
   while(i--)
-    if (fabsf(A.M[i] - B.M[i]) > EQUAL_F)
+    if (fabsf(A.M[i] - B.M[i]) > EPSILON_F)
       return false;
   return true;
 }
@@ -64,7 +64,7 @@ bool operator == (const Matrix<double, m, n> &A,
   size_t i = n * m;
 
   while(i--)
-    if (fabsf(A.M[i] - B.M[i]) > EQUAL_D)
+    if (fabsf(A.M[i] - B.M[i]) > EPSILON_D)
       return false;
   return true;
 }
@@ -112,6 +112,7 @@ template <typename T, size_t m, size_t n>
 void matrix_fancy_print (const Matrix<T, m, n> &A) {
 
   if (A.tr) {
+    matrixDbgPrint("Matrix print cheat\n");
     /* little cheat for transposed matrix */
     Matrix<T, m, n> B;
     matrix_deep_transpose(n, m, A.M, B.M);
