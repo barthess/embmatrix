@@ -112,7 +112,7 @@ template <typename T, size_t m, size_t n>
 void matrix_fancy_print (const Matrix<T, m, n> &A) {
 
   if (A.tr) {
-    matrixDbgPrint("Matrix print cheat\n");
+    matrixDbgPrint("Matrix print transpose cheat\n");
     /* little cheat for transposed matrix */
     Matrix<T, m, n> B;
     matrix_deep_transpose(n, m, A.M, B.M);
