@@ -7,6 +7,9 @@
 #include "matrix_osal.hpp"
 #include "matrix_primitives.hpp"
 
+#define MATRIX_COPY_CTOR_ENABLED true
+#define MATRIX_COPY_OPERATOR_ENABLED true
+
 namespace matrix {
 
 template<typename T, size_t r, size_t c>
@@ -32,7 +35,7 @@ public:
   /**
    * @brief   Copy constructor. Keep it for testing
    */
-#if defined(MATRIX_COPY_CTOR_ENABLED)
+#if MATRIX_COPY_CTOR_ENABLED
   Matrix(const Matrix &src){
     matrixDbgPrint("Matrix copy constructor\n");
     _default_ctor();
@@ -44,9 +47,22 @@ public:
 #endif /* MATRIX_COPY_CTOR_FORBIDDEN */
 
   /**
-   * @brief
+   * @brief Copy operator
    */
+#if MATRIX_COPY_OPERATOR_ENABLED
+  Matrix& operator = (const Matrix &src) {
+    matrixDbgPrint("Matrix copy operator\n");
+    if (this == &src) {
+      return *this;
+    } else {
+      memcpy(this->M, src.M, msize());
+      this->tr = src.tr;
+      return *this;
+    }
+  }
+#else
   void operator = (const Matrix &src) = delete; /* Assign forbidden */
+#endif /* MATRIX_COPY_OPERATOR_ENABLED */
 
   /**
    *
