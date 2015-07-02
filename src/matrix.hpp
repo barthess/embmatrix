@@ -7,8 +7,8 @@
 #include "matrix_osal.hpp"
 #include "matrix_primitives.hpp"
 
-#define MATRIX_COPY_CTOR_ENABLED true
-#define MATRIX_COPY_OPERATOR_ENABLED true
+#define MATRIX_COPY_CTOR_ENABLED 1
+#define MATRIX_COPY_OPERATOR_ENABLED 1
 
 namespace matrix {
 
