@@ -2,6 +2,8 @@
 #define MATRIX_PRIMITIVES_H
 
 #include <cstdint>
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 namespace matrix {
 
