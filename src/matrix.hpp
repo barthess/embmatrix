@@ -136,21 +136,6 @@ public:
   }
 
   /**
-   * @brief Inverse operator
-   */
-  Matrix& operator ! (void) {
-    matrixDbgPrint("Matrix inverse operator\n");
-    static_assert(c == r, "matrix must be square");
-     /* current realization can not inverse transposed matrices */
-    matrixDbgCheck(false == tr);
-
-    /* The function returns 1 on success, 0 on failure. */
-    int inv_res = matrix_inverse(c, M);
-    matrixDbgCheck(1 == inv_res); /* matrix inversion failed */
-    return *this;
-  }
-
-  /**
    * @note    here is no need to check sizes at run time
    */
   Matrix operator + (const Matrix &right) const {
@@ -265,6 +250,13 @@ public:
    */
   template <typename U, size_t m, size_t n>
   friend Matrix<U, n, m> operator ~ (Matrix<U, m, n> &&left);
+
+  /**
+   * @brief Transpose operator
+   * @note  Performs deep array move
+   */
+  template <typename U, size_t m, size_t n>
+  friend Matrix<U, n, m> transpose_deep(Matrix<U, m, n> &&left);
 
   /**
    * @brief Return matrix size in bytes
@@ -411,6 +403,40 @@ Matrix<T, m, n> operator / (Matrix<T, m, n> &&left, T scale) {
 }
 
 /**
+ * @brief Inverse operator
+ */
+template <typename T, size_t m>
+Matrix<T, m, m> operator ! (const Matrix<T, m, m> &left) {
+  matrixDbgPrint("Matrix inverse operator\n");
+  Matrix<T, m, m> ret(left);
+  if (ret.tr) {
+    ret = transpose_deep(std::move(ret));
+    ret.tr = false;
+  }
+  /* The function returns 1 on success, 0 on failure. */
+  int inv_res = matrix_inverse(m, ret.M);
+  matrixDbgCheck(1 == inv_res); /* matrix inversion failed */
+  return ret;
+}
+
+/**
+ * @brief Inverse operator
+ */
+template <typename T, size_t m>
+Matrix<T, m, m> operator ! (Matrix<T, m, m> &&left) {
+  matrixDbgPrint("Matrix move inverse operator\n");
+  Matrix<T, m, m> ret(std::move(left));
+  if (ret.tr) {
+    ret = transpose_deep(std::move(ret));
+    ret.tr = false;
+  }
+  /* The function returns 1 on success, 0 on failure. */
+  int inv_res = matrix_inverse(m, ret.M);
+  matrixDbgCheck(1 == inv_res); /* matrix inversion failed */
+  return ret;
+}
+
+/**
  * @brief Transpose operator
  * @note  Performs array copy
  */
@@ -447,6 +473,27 @@ Matrix<U, n, m> operator ~ (Matrix<U, m, n> &&left) {
   Matrix<U, n, m> ret(left.M, left.tr);
   left.M = nullptr;
   ret.tr = !ret.tr;
+  return ret;
+}
+
+/**
+ * @brief Transpose operator
+ * @note  Performs deep array move
+ */
+template <typename U, size_t m, size_t n>
+Matrix<U, n, m> transpose_deep(Matrix<U, m, n> &&left) {
+  matrixDbgPrint("Matrix deep transpose move\n");
+  /* this functions always returns direct matrices */
+  Matrix<U, n, m> ret(left.M, false);
+  left.M = nullptr;
+  U tmp;
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = i + 1; j < m; j++) {
+      tmp = ret.M[i*n + j];
+      ret.M[i*n + j] = ret.M[j*n + i];
+      ret.M[j*n + i] = tmp;
+    }
+  }
   return ret;
 }
 
