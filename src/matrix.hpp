@@ -260,6 +260,13 @@ public:
   }
 
   /**
+   * @brief Transpose operator
+   * @note  Performs array move
+   */
+  template <typename U, size_t m, size_t n>
+  friend Matrix<U, n, m> operator ~ (Matrix<U, m, n> &&left);
+
+  /**
    * @brief Return matrix size in bytes
    */
   constexpr size_t msize(void) {
@@ -267,6 +274,18 @@ public:
   }
 
 private:
+  /**
+   * @note  WARNING!!! no size checks
+   * @note  Use it only if you know what to do
+   * @note  Keep it for move transpose operator
+   * @brief Matrix array's wrapper constructor
+   */
+  Matrix(T *array, bool tr) {
+    matrixDbgPrint("Matrix array's wrapper constructor\n");
+    this->M = array;
+    this->tr = tr;
+  }
+
   /**
    * @brief Determine closest suitable pool size
    */
@@ -420,12 +439,13 @@ Matrix<T, n, m> transpose_deep(const Matrix<T, m, n> &left) {
 
 /**
  * @brief Transpose operator
- * @note  Uses move semantic
+ * @note  Performs array move
  */
-template <typename T, size_t m, size_t n>
-Matrix<T, n, m> operator ~ (Matrix<T, m, n> &&left) {
+template <typename U, size_t m, size_t n>
+Matrix<U, n, m> operator ~ (Matrix<U, m, n> &&left) {
   matrixDbgPrint("Matrix move transpose\n");
-  Matrix<T, n, m> ret(std::move(left));
+  Matrix<U, n, m> ret(left.M, left.tr);
+  left.M = nullptr;
   ret.tr = !ret.tr;
   return ret;
 }
