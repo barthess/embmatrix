@@ -136,25 +136,6 @@ public:
   }
 
   /**
-   * @note    here is no need to check sizes at run time
-   */
-  Matrix operator + (const Matrix &right) const {
-    matrixDbgPrint("Matrix + operator\n");
-    Matrix<T, r, c> ret;
-
-    if (!this->tr && !right.tr)
-      matrix_add(r*c, this->M, right.M, ret.M);
-    else if (this->tr && !right.tr)
-      matrix_add_TA(r, c, this->M, right.M, ret.M);
-    else if (!this->tr && right.tr)
-      matrix_add_TB(r, c, this->M, right.M, ret.M);
-    else
-      matrix_add_TAB(r, c, this->M, right.M, ret.M);
-
-    return ret;
-  }
-
-  /**
    *
    */
   void operator += (const Matrix &right) {
@@ -168,25 +149,6 @@ public:
       matrix_increase_TA(r, c, right.M, this->M);
     else
       matrix_increase(r*c, right.M, this->M);
-  }
-
-  /**
-   * @note    here is no need to check sizes at run time
-   */
-  Matrix operator - (const Matrix &right) const {
-    matrixDbgPrint("Matrix - operator\n");
-    Matrix<T, r, c> ret;
-
-    if (!this->tr && !right.tr)
-      matrix_substract(r*c, this->M, right.M, ret.M);
-    else if (this->tr && !right.tr)
-      matrix_substract_TA(r, c, this->M, right.M, ret.M);
-    else if (!this->tr && right.tr)
-      matrix_substract_TB(r, c, this->M, right.M, ret.M);
-    else
-      matrix_substract_TAB(r, c, this->M, right.M, ret.M);
-
-    return ret;
   }
 
   /**
@@ -316,6 +278,137 @@ private:
     return row*c + col;
   }
 };
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator -(const Matrix<T, m, n> &right) {
+  return right*static_cast<T>(-1.0);
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator -(Matrix<T, m, n> &&right) {
+  return std::move(right)*static_cast<T>(-1.0);
+}
+
+/**
+ * @note    here is no need to check sizes at run time
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator - (const Matrix<T, m, n> &left,
+                            const Matrix<T, m, n> &right) {
+  matrixDbgPrint("Matrix - operator\n");
+  Matrix<T, m, n> ret;
+
+  if (!left.tr && !right.tr)
+    matrix_substract(m*n, left.M, right.M, ret.M);
+  else if (left.tr && !right.tr)
+    matrix_substract_TA(m, n, left.M, right.M, ret.M);
+  else if (!left.tr && right.tr)
+    matrix_substract_TB(m, n, left.M, right.M, ret.M);
+  else
+    matrix_substract_TAB(m, n, left.M, right.M, ret.M);
+
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator - (Matrix<T, m, n> &&left,
+                            const Matrix<T, m, n> &right) {
+  matrixDbgPrint("Matrix - rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(left));
+  ret -= right;
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator - (const Matrix<T, m, n> &left,
+                            Matrix<T, m, n> &&right) {
+  matrixDbgPrint("Matrix - rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(right));
+  ret -= left;
+  ret = std::move(ret)*static_cast<T>(-1.0);
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator - (Matrix<T, m, n> &&left,
+                            Matrix<T, m, n> &&right) {
+  matrixDbgPrint("Matrix - rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(left));
+  ret -= right;
+  return ret;
+}
+
+/**
+ * @note    here is no need to check sizes at run time
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator + (const Matrix<T, m, n> &left,
+                            const Matrix<T, m, n> &right) {
+  matrixDbgPrint("Matrix + operator\n");
+  Matrix<T, m, n> ret;
+
+  if (!left.tr && !right.tr)
+    matrix_add(m*n, left.M, right.M, ret.M);
+  else if (left.tr && !right.tr)
+    matrix_add_TA(m, n, left.M, right.M, ret.M);
+  else if (!left.tr && right.tr)
+    matrix_add_TB(m, n, left.M, right.M, ret.M);
+  else
+    matrix_add_TAB(m, n, left.M, right.M, ret.M);
+
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator + (const Matrix<T, m, n> &left,
+                            Matrix<T, m, n> &&right) {
+  matrixDbgPrint("Matrix + rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(right));
+  ret += left;
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator + (Matrix<T, m, n> &&left,
+                            const Matrix<T, m, n> &right) {
+  matrixDbgPrint("Matrix + rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(left));
+  ret += right;
+  return ret;
+}
+
+/**
+ *
+ */
+template <typename T, size_t m, size_t n>
+Matrix<T, m, n> operator + (Matrix<T, m, n> &&left,
+                            Matrix<T, m, n> &&right) {
+  matrixDbgPrint("Matrix + rvalue operator\n");
+  Matrix<T, m, n> ret(std::move(left));
+  ret += right;
+  return ret;
+}
 
 /**
  * Multiplication operator
