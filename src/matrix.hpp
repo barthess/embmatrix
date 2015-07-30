@@ -629,22 +629,20 @@ T norm(const Matrix<T, r, c> &mtrx) {
 /**
  * @brief Matrix square root
  */
-template <typename T, size_t size>
-Matrix<T, size, size> sqrtm(const Matrix<T, size, size> &mtrx,
-                            const size_t maxIter = 50,
-                            const T epsilon = 1e-5) {
+template <typename T, size_t m>
+Matrix<T, m, m> sqrtm(const Matrix<T, m, m> &mtr,
+                      const size_t maxIter = 50,
+                      const T epsilon = static_cast<T>(1e-5)) {
   matrixDbgPrint("Matrix square root\n");
 
-  Matrix<T, size, size> tmp(0, 1);
-  Matrix<T, size, size> result(mtrx), currentSqrtm, copyResult, copyTmp;
+  Matrix<T, m, m> tmp(static_cast<T>(0.0), static_cast<T>(1.0));
+  Matrix<T, m, m> result(mtr), currentSqrtm;
   T normDelta;
 
   for (size_t i = 0; i < maxIter; i++) {
-    copyResult = result;
-    copyTmp = tmp;
-    currentSqrtm = (result + !copyTmp) * static_cast<T>(0.5);
-    tmp = (tmp + !copyResult) * static_cast<T>(0.5);
-    normDelta = matrix_modulus((result - currentSqrtm).M, size*size);
+    currentSqrtm = (result + !tmp) * static_cast<T>(0.5);
+    tmp = (tmp + !result) * static_cast<T>(0.5);
+    normDelta = norm(result - currentSqrtm);
     result = currentSqrtm;
     if (normDelta < epsilon)
       return result;
