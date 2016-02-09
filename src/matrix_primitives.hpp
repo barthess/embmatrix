@@ -105,10 +105,10 @@ void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B) {
 //
 //      /* main cycle */
 //      for(k=0; k<Nround; k+=4){
-//        s = A[i*p + k]   * B[k*n + j]     +
-//            A[i*p + k+1] * B[(k+1)*n + j] +
-//            A[i*p + k+2] * B[(k+2)*n + j] +
-//            A[i*p + k+3] * B[(k+3)*n + j];
+//        s += A[i*p + k]   * B[k*n + j]     +
+//             A[i*p + k+1] * B[(k+1)*n + j] +
+//             A[i*p + k+2] * B[(k+2)*n + j] +
+//             A[i*p + k+3] * B[(k+3)*n + j];
 //      }
 //
 //      /* tail processing */
@@ -195,7 +195,7 @@ void matrix_multiply_TB(size_t m, size_t p, size_t n,
     for(j=0; j<n; j++) {
       tmp = 0;
       for(k=0; k<p; k++)
-        tmp += A[i*p + k] * B[p*j + k];
+        tmp += A[i*p + k] * B[j*p + k];
       *C++ = tmp;
     }
   }
