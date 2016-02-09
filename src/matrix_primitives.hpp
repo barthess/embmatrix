@@ -2,6 +2,8 @@
 #define MATRIX_PRIMITIVES_H
 
 #include <cstdint>
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 namespace matrix {
 
@@ -19,8 +21,10 @@ namespace matrix {
 template <typename T>
 T matrix_modulus(const T *A, size_t len){
   T R = 0;
-  while(len--)
-    R += *A * *A++;
+  while(len--) {
+    R += *A * *A;
+    A++;
+  }
   return sqrt(R);
 }
 
