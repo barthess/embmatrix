@@ -45,10 +45,13 @@ template <typename T>
 void matrix_deep_transpose(size_t m, size_t n, const T *A, T *B) {
   size_t i, j;
 
-  for(i=0; i<m; i++)
-    for(j=0; j<n; j++)
-      *B++ = A[i + j*m];
+  for(i=0; i<m; i++) {
+    for(j=0; j<n; j++) {
+      B[i + j*m] = *A++;
+    }
+  }
 }
+
 
 ///**
 // * @brief   multiply matrix A(m x p) by  B(p x n), put result in C(m x n)
