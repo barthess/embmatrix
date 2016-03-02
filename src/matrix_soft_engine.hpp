@@ -113,7 +113,7 @@ void matrix_soft_dot_TAB(size_t m, size_t p, size_t n,
     for(j=0; j<n; j++) {
       tmp = 0;
       for(k=0; k<p; k++)
-        tmp += A[k*m + i] * B[p*j + k];
+        tmp += A[k*m + i] * B[j*p + k];
       *C++ = tmp;
     }
   }
